@@ -1,22 +1,27 @@
 "use client";
 
-import { useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Upload, FileText, Briefcase, ArrowLeft, 
-  AlertCircle, ArrowRight, Sparkles, Shield, 
-  CheckCircle2 
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  AlertCircle,
+  ArrowLeft,
+  ArrowRight,
+  Briefcase,
+  CheckCircle2,
+  FileText,
+  Shield,
+  Sparkles,
+  Upload
 } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useCallback, useState } from "react";
 import { toast } from "sonner";
 
 // UI Components
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import httpClient from "@/lib/axios-client";
-import { log } from "node:console";
 
 // Localized Types
 type AnalysisType = "ats_scan" | "job_match";
@@ -119,7 +124,7 @@ const handleSubmit = async () => {
       // 4. Send Request via httpClient
       // Note: Use a template literal to define the specific endpoint for the type
       const response = await httpClient.post(
-        `/analyzer/${analysisType === "ats_scan" ? "ats-scan" : "job-matcher"}`, 
+        `/analyzer/parse-resume`, 
         formData,
         {
           headers: {
@@ -132,9 +137,9 @@ const handleSubmit = async () => {
       const result = response.data; // Assuming your axios client returns data directly
       console.log(result);
       
-      // toast.success("Analysis started!", { id: loadingToast });
+      toast.success("Analysis started!", { id: loadingToast });
       // // Redirect to the processing or results page using the ID from backend
-      // router.push(`/analysis/${result?.data?.id || result?.id}`);
+      router.push(`/analysis/${result?.data?.id || result?.id}`);
 
     } catch (error: any) {
       // 6. Handle Errors

@@ -13,57 +13,19 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 interface AnalysisPageProps {
-  id: string;
+ data:any
 }
 
-export default function AnalysisDetails({ id }: AnalysisPageProps) {
-  const [data, setData] = useState<any>(null);
+export default function AnalysisDetails({ data }: AnalysisPageProps) {
+  // const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
   // 1. Dummy API Call Simulation
-  useEffect(() => {
-    const fetchAnalysis = async () => {
-      setLoading(true);
-      // Simulate network delay
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-      
-      const mockResult = {
-        id: id,
-        status: "success",
-        analysis_type: "ATS_SCAN",
-        overall_score: 84,
-        summary: "Your resume is highly parseable, but lacks specific technical density required for high-volume automated filters.",
-        vitals: [
-          { label: "Formatting", score: 92, status: "success", insight: "Clean layout; standard fonts detected." },
-          { label: "Readability", score: 88, status: "success", insight: "Balanced white space and bullet density." },
-          { label: "Skill Density", score: 65, status: "warning", insight: "Missing critical cloud-native infrastructure terms." }
-        ],
-        technical_audit: {
-          header_check: "PASS",
-          section_structure: "PASS",
-          font_compatibility: "PASS",
-          tables_detected: "NONE"
-        },
-        keyword_cloud: {
-          detected: ["React", "TypeScript", "Node.js", "Tailwind", "Next.js"],
-          missing_high_priority: ["CI/CD Pipelines", "Unit Testing", "Microservices", "Docker"]
-        },
-        critical_improvements: [
-          { area: "Keyword Gap", issue: "Missing 'Scalability' keywords.", fix: "Integrate these into your experience bullet points." },
-          { area: "Action Verbs", issue: "Passive language detected.", fix: "Replace 'Worked on' with 'Architected'." }
-        ]
-      };
-      
-      setData(mockResult);
-      setLoading(false);
-    };
 
-    fetchAnalysis();
-  }, [id]);
 
   // 2. Loading Skeleton Component
-  if (loading) return <AnalysisSkeleton />;
+  // if (loading) return <AnalysisSkeleton />;
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] text-foreground p-4 md:p-8">
@@ -78,7 +40,7 @@ export default function AnalysisDetails({ id }: AnalysisPageProps) {
               </Button>
               <span>Back to Dashboard</span>
               <span className="text-border">/</span>
-              <span className="text-primary font-medium">Analysis #{id.slice(0, 6)}</span>
+              {/* <span className="text-primary font-medium">Analysis #{id.slice(0, 6)}</span> */}
             </div>
             <h1 className="text-3xl font-bold tracking-tight">Analysis <span className="text-primary">Report</span></h1>
           </div>

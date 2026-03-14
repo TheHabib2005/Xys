@@ -1,3 +1,4 @@
+import AnalysisDetailsWrapper from '@/components/modules/analysis/AnalysisDetailsWrapper'
 import AnalysisDetails from '@/components/modules/analysis/ATSAnalysisDetails'
 import JobMatcherDetails from '@/components/modules/analysis/JobMatcherAnalysisDetails'
 import React from 'react'
@@ -7,8 +8,7 @@ const AnalysisDetailsPage = async ({params}:{params:{id:string}}) => {
   return (
     <div>
 
-      <AnalysisDetails id={id}/>
-      {/* <JobMatcherDetails id={id}/> */}
+    <AnalysisDetailsWrapper id={id}/>
 
     </div>
   )
