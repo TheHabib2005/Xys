@@ -137,9 +137,8 @@ const handleSubmit = async () => {
       const result = response.data; // Assuming your axios client returns data directly
       console.log(result);
       
-      toast.success("Analysis started!", { id: loadingToast });
       // // Redirect to the processing or results page using the ID from backend
-      router.push(`/analysis/${result?.data?.id || result?.id}`);
+      router.push(`/analysis/${result?.data?.analysisId || result?.analysisId}`);
 
     } catch (error: any) {
       // 6. Handle Errors

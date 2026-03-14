@@ -22,6 +22,8 @@ export default function UserContextWrapper({ children }: { children: React.React
       try {
         const res = await getMe()
         setUserPayload({ user: res?.data || null, isLoading: false });
+        console.log(res?.data);
+        
       } catch (err) {
         console.error(err);
         setUserPayload({ user: null, isLoading: false });

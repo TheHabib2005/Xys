@@ -1,9 +1,7 @@
 "use client"
-import { useApiQuery } from '@/hooks/useApiQuery'
 import httpClient from '@/lib/axios-client';
-import React, { useEffect, useState } from 'react'
-import { useStackId } from 'recharts/types/cartesian/BarStack';
-import AnalysisDetails from './ATSAnalysisDetails';
+import { useEffect, useState } from 'react';
+import AnalysisDetails, { AnalysisSkeleton } from './ATSAnalysisDetails';
 import JobMatcherDetails from './JobMatcherAnalysisDetails';
 
 const AnalysisDetailsWrapper = ({id}:{id:string}) => {
@@ -21,6 +19,8 @@ const AnalysisDetailsWrapper = ({id}:{id:string}) => {
           },
         }
       );
+      console.log(response.data);
+      
       setData(response.data.data)
     setLoadign(false)
     }
@@ -31,11 +31,11 @@ const AnalysisDetailsWrapper = ({id}:{id:string}) => {
     
 
       if(loading) return <h1>Loading.....</h1>
-      if(!data && !loading) return <h1> not found</h1>
+      if(!data && !loading) return <AnalysisSkeleton/>
 
   return (
     <div>
-
+{/* {data && JSON.stringify(data)} */}
  {
     data && data?.analysis_type === "ATS_SCAN" ? <AnalysisDetails data={data}/> : <JobMatcherDetails data={data}/>
  }
