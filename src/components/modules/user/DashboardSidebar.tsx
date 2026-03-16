@@ -28,7 +28,7 @@ import { useRouter } from "next/navigation";
 const navItems = [
   { path: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { path: "/dashboard/profile", label: "Profile", icon: User },
-  { path: "/create-resume", label: "Create Resume", icon: FilePlus },
+  { path: "/dashboard/resumes", label: "Create Resume", icon: FilePlus },
   { path: "/profile/history", label: "History", icon: History },
   { path: "/profile/plans", label: "Plans", icon: CreditCard },
   { path: "/profile/settings", label: "Settings", icon: Settings },

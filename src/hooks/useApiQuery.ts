@@ -21,6 +21,8 @@ export function useApiQuery<T>(
         if (fetchMethod === "axios") {
           // Client-side Axios
           const { data } = await httpClient.get(endpoint);
+          console.log(data);
+          
           return data
         } else {
           // Server-side fetch with ISR support
