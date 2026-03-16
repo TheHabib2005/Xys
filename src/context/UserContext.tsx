@@ -1,5 +1,6 @@
 "use client";
 
+import AppLoader from "@/components/global/AppLoader";
 import { IUser } from "@/interfaces/user";
 import { getMe } from "@/services/auth.services";
 import { createContext, useContext, useEffect, useState } from "react";
@@ -35,12 +36,7 @@ export default function UserContextWrapper({ children }: { children: React.React
 
   // Loading overlay
   if (userPayload.isLoading) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-        <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-white"></div>
-        hello Loading...
-      </div>
-    );
+    return <AppLoader/>
   }
 
   return <UserContext.Provider value={userPayload}>{children}</UserContext.Provider>;

@@ -47,7 +47,7 @@ export const handleLogin = async (loginPayload: signInPayloadType) => {
 
     await setTokenInCookies("accessToken", accessToken,15*60);
     await setTokenInCookies("better-auth.session_token", sessionToken,15*60);
-    await setTokenInCookies("refreshToken", refreshToken,30*60);
+    await setTokenInCookies("refreshToken", refreshToken,60*60);
     //  redirect("/dashboard")
     return {
       success: true,
@@ -60,7 +60,6 @@ export const handleLogin = async (loginPayload: signInPayloadType) => {
       success: false,
       message: error.response.data.message || error.message || "Failed to Login"
     }
-
   }
 }
 export const handleLogout = async () => {

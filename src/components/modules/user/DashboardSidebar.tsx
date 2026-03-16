@@ -7,7 +7,8 @@ import {
   CreditCard, 
   History, 
   LogOut, 
-  FilePlus 
+  FilePlus, 
+  LucideBookTemplate
 } from "lucide-react";
 
 import { NavLink } from "@/components/global/NavLink"; // Using the converted Next.js NavLink
@@ -24,11 +25,13 @@ import {
 } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
 import { useRouter } from "next/navigation";
+import UserCreditCard from "./UserCreditCard";
 
 const navItems = [
   { path: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
   { path: "/dashboard/profile", label: "Profile", icon: User },
-  { path: "/dashboard/resumes", label: "Create Resume", icon: FilePlus },
+  { path: "/dashboard/templates", label: "Explor Templates", icon: LucideBookTemplate },
+  { path: "/dashboard/resumes", label: "My Resumes", icon: FilePlus },
   { path: "/profile/history", label: "History", icon: History },
   { path: "/profile/plans", label: "Plans", icon: CreditCard },
   { path: "/profile/settings", label: "Settings", icon: Settings },
@@ -59,7 +62,7 @@ export default function DashboardSidebar() {
           <SidebarGroupLabel className="px-4 text-[10px] uppercase font-bold tracking-widest text-sidebar-foreground/40">
             { "Main Menu"}
           </SidebarGroupLabel>
-          
+          <UserCreditCard/>
           <SidebarGroupContent className="mt-2">
             <SidebarMenu className="gap-1 px-2">
               {navItems.map((item) => (

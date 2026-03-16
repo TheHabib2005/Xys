@@ -1,12 +1,9 @@
 import React from 'react'
-import CreateResumeWrapper from '../../../../components/modules/resume/CreateResumeWrapper'
 
-const CreateResumePage = () => {
+const MyResumeLists = () => {
   return (
-    <div>
-      <CreateResumeWrapper/>
-    </div>
+    <div>MyResumeLists</div>
   )
 }
 
-export default CreateResumePage
+export default MyResumeLists

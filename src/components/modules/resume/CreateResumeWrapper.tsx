@@ -5,7 +5,9 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Sparkles, Filter, Crown, FileText, 
-  ArrowRight, Wand2, Loader2, ArrowLeft 
+  ArrowRight, Wand2, Loader2, ArrowLeft, 
+  Plus,
+  LayoutGrid
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -77,7 +79,7 @@ export default function CreateResumeWrapper() {
   });
 
   const handleSelectTemplate = (id: string) => {
-    router.push(`/dashboard/resumes/${id}?mode=template`);
+    router.push(`/dashboard/templates/${id}?mode=template`);
   };
 
   const handleAiGenerate = async () => {
@@ -92,29 +94,7 @@ export default function CreateResumeWrapper() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <div className="border-b border-border bg-card/50 backdrop-blur-sm sticky top-0 z-30">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" onClick={() => router.back()}>
-              <ArrowLeft className="h-4 w-4" />
-            </Button>
-            <div className="flex items-center gap-2.5">
-              <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                <Sparkles className="h-4 w-4 text-primary-foreground" />
-              </div>
-              <span className="font-display text-lg font-bold italic tracking-tight">Blitz AI</span>
-            </div>
-          </div>
-          <Button
-            onClick={() => setAiModalOpen(true)}
-            className="bg-primary text-primary-foreground shadow-lg shadow-primary/20 rounded-full"
-          >
-            <Wand2 className="h-4 w-4 mr-2" />
-            Generate with AI
-          </Button>
-        </div>
-      </div>
+
 
       <div className="container mx-auto px-6 py-10">
         {/* Hero */}
@@ -165,6 +145,19 @@ export default function CreateResumeWrapper() {
 
         {/* Template Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {/* custom card */}
+           <motion.div
+            whileHover={{ y: -5 }}
+            className="group relative cursor-pointer rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 flex flex-col items-center justify-center text-center transition-all hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm"
+          >
+            <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mb-6 group-hover:bg-zinc-900 dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-colors">
+              <Plus className="h-8 w-8" />
+            </div>
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">Blank Slate</h3>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400">
+              Start from scratch and build your resume your way.
+            </p>
+          </motion.div>
           {/* AI Generation Card */}
           <motion.div
             whileHover={{ scale: 1.02 }}
@@ -179,65 +172,67 @@ export default function CreateResumeWrapper() {
               Upload a job description and let Blitz AI tailor your resume instantly.
             </p>
           </motion.div>
+         
 
-          {/* Actual Data */}
-          {isFetching ? (
-            Array.from({ length: 4 }).map((_, i) => <TemplateSkeleton key={i} />)
-          ) : (
-            <AnimatePresence mode="popLayout">
-              {filtered.map((template) => (
-                <motion.div
-                  key={template.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.9 }}
-                  transition={{ duration: 0.3 }}
-                  onClick={() => handleSelectTemplate(template.id)}
-                  className="group relative cursor-pointer rounded-2xl border border-border bg-card overflow-hidden hover:border-primary hover:shadow-2xl hover:shadow-primary/5 transition-all flex flex-col"
-                >
-                  {/* Image/Preview Area */}
-                  <div className="relative h-52 bg-muted overflow-hidden">
-                    <img 
-                      src={template.previewUrl} 
-                      alt={template.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    {template.isPremium && (
-                      <Badge className="absolute top-3 right-3 bg-amber-500 text-white border-none shadow-lg">
-                        <Crown className="h-3 w-3 mr-1" /> Premium
-                      </Badge>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
-                       <p className="text-white text-xs font-medium line-clamp-2">
-                        {template.descriptions.core_details}
-                       </p>
-                    </div>
-                  </div>
+         
+        </div>
+        {/* --- Section: Market Templates --- */}
+        <div className="space-y-8 mt-8">
+          <div className="flex items-center gap-3">
+            <LayoutGrid className="h-5 w-5 text-primary" />
+            <h2 className="text-2xl font-bold tracking-tight">Marketplace Templates</h2>
+          </div>
 
-                  {/* Content Area */}
-                  <div className="p-5 flex-1 flex flex-col justify-between">
-                    <div>
-                      <h3 className="text-lg font-bold group-hover:text-primary transition-colors">{template.name}</h3>
-                      <p className="text-xs text-muted-foreground mt-1 mb-3">
-                        Target: {template.descriptions.targetUser}
-                      </p>
-                    </div>
-                    
-                    <div className="flex items-center justify-between pt-4 border-t border-border/50">
-                      <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-muted-foreground">
-                        <FileText className="h-3 w-3" />
-                        {template.sections.length} Sections
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {isFetching ? (
+              Array.from({ length: 4 }).map((_, i) => <TemplateSkeleton key={i} />)
+            ) : (
+              <AnimatePresence mode="popLayout">
+                {filtered.map((template) => (
+                  <motion.div
+                    key={template.id}
+                    layout
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.95 }}
+                    onClick={() => handleSelectTemplate(template.id)}
+                    className="group flex flex-col bg-card rounded-2xl border border-border overflow-hidden hover:border-primary/50 hover:shadow-2xl transition-all cursor-pointer"
+                  >
+                    <div className="relative aspect-[3/4] bg-muted overflow-hidden">
+                      <img 
+                        src={template.previewUrl} 
+                        alt={template.name}
+                        className="w-full h-full object-cover object-top group-hover:scale-110 transition-transform duration-700"
+                      />
+                      {template.isPremium && (
+                        <Badge className="absolute top-4 right-4 bg-amber-500 hover:bg-amber-600 text-white border-none shadow-xl">
+                          <Crown className="h-3 w-3 mr-1.5" /> Premium
+                        </Badge>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end p-6">
+                         <Button className="w-full rounded-full font-bold">Use Template</Button>
                       </div>
-                      <span className="text-xs text-primary font-bold flex items-center gap-1">
-                        Select <ArrowRight className="h-3 w-3" />
-                      </span>
                     </div>
-                  </div>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          )}
+
+                    <div className="p-5 flex-1 flex flex-col">
+                      <h3 className="text-lg font-bold group-hover:text-primary transition-colors mb-1">{template.name}</h3>
+                      <p className="text-xs text-muted-foreground line-clamp-2 mb-4">
+                        {template.descriptions.core_details}
+                      </p>
+                      
+                      <div className="mt-auto pt-4 border-t border-border flex items-center justify-between">
+                        <div className="flex items-center gap-1.5 text-[10px] font-black uppercase text-muted-foreground tracking-widest">
+                          <FileText className="h-3 w-3" />
+                          {template.sections.length} Sections
+                        </div>
+                        <ArrowRight className="h-4 w-4 text-primary opacity-0 -translate-x-2 group-hover:opacity-100 group-hover:translate-x-0 transition-all" />
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </AnimatePresence>
+            )}
+          </div>
         </div>
       </div>
 

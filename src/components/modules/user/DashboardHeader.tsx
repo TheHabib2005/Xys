@@ -30,6 +30,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import UserProfile from "../auth/UserProfilePopup";
+import UserCreditCard from "./UserCreditCard";
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -38,26 +39,17 @@ export default function DashboardHeader() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
+  // const credit =
+
   // Prevent hydration mismatch for theme icons
   useEffect(() => {
     setMounted(true);
   }, []);
 
-  const initials = user?.name
-    ?.split(" ")
-    .map((w: string) => w[0])
-    .join("")
-    .toUpperCase()
-    .slice(0, 2) || "U";
 
-  const handleLogout = async () => {
-    try {
-      // await logout();
-      router.push("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+
+
+
 
   return (
     <header className="w-full sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur-xl">
@@ -117,6 +109,8 @@ export default function DashboardHeader() {
               )}
             </Button>
           )}
+
+       
 
          {
           user ? <UserProfile user={user}/> : <Button>SignIn</Button>

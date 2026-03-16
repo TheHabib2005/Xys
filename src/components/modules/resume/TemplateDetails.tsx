@@ -74,14 +74,14 @@ const TemplateDetails = ({ id }: TemplateDetailsProps) => {
 
   const confirmUsage =async () => {
     // Logic to deduct 10 credits via API would go here
-    // setUserCredits(prev => prev - 10);
+    setUserCredits(prev => prev - 10);
 
   
  const result = await initlizeResumeMutation.mutateAsync({
     templateId:id
  })
 
-   router.push(`/dashboard/resumes/${id}/builder/${result.data.id}`);
+   router.push(`/dashboard/templates/${id}/builder/${result.data.id}`);
   
   };
   const template = data?.data;

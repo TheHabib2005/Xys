@@ -6,7 +6,7 @@ import { getTokens, isTokenExpiringSoon, refreshTokens } from './services/auth.s
 import { UserRole } from './interfaces/enums';
 
 const AUTH_ROUTES = ['/sign-in', '/sign-up'];
-const PUBLIC_ROUTES = ['/', '/about-us',"/ai","/create-resume"];
+const PUBLIC_ROUTES = ['/', '/about-us',"/ai"];
 const PUBLIC_DYNAMIC_PREFIXES = ['/doctors'];
 
 export async function proxy(request: NextRequest) {
@@ -58,6 +58,8 @@ export async function proxy(request: NextRequest) {
         sameSite: 'lax',
       });
 
+      console.log("client token updated");
+      
       return response;
     } catch {
       return NextResponse.redirect(signInUrl);
