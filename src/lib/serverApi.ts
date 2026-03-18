@@ -33,7 +33,8 @@ export async function refreshAccessToken(cookies:string): Promise<string | null>
       await setTokenInCookies("accessToken",accessToken,10*60)
       await setTokenInCookies("refreshToken",refreshToken,30*60)
       await setTokenInCookies("better-auth.session_token",sessionToken,10*60)
-
+    console.log("token updated from client");
+    
       return json?.data.accessToken ?? null
      } catch (error) {
       console.log("refresh token error",error);

@@ -10,6 +10,8 @@ interface Props {
 }
 
 export const ExperienceStep = ({ data, onChange }: Props) => {
+  console.log("exp",data);
+  
   const addExperience = () => {
     const newExp: Experience = {
       id: crypto.randomUUID(),

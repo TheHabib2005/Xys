@@ -62,7 +62,7 @@ export default function DashboardSidebar() {
           <SidebarGroupLabel className="px-4 text-[10px] uppercase font-bold tracking-widest text-sidebar-foreground/40">
             { "Main Menu"}
           </SidebarGroupLabel>
-          <UserCreditCard/>
+    
           <SidebarGroupContent className="mt-2">
             <SidebarMenu className="gap-1 px-2">
               {navItems.map((item) => (

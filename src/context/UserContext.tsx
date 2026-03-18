@@ -9,27 +9,31 @@ import { createContext, useContext, useEffect, useState } from "react";
 interface IUserContext {
   user: IUser | null,
   isLoading:boolean
+  fetchUser?:()=> void
+
 }
 export const UserContext = createContext<IUserContext | undefined>(undefined);
 
 export default function UserContextWrapper({ children }: { children: React.ReactNode }) {
-  const [userPayload, setUserPayload] = useState<{ user: any; isLoading: boolean }>({
+  const [userPayload, setUserPayload] = useState<{ user: any; isLoading: boolean;
+    fetchUser?:()=> void
+  }>({
     user: null,
     isLoading: true,
   });
-
-  useEffect(() => {
     const fetchUser = async () => {
       try {
         const res = await getMe()
-        setUserPayload({ user: res?.data || null, isLoading: false });
+        setUserPayload({ user: res?.data || null, isLoading: false ,fetchUser:fetchUser});
         console.log(res?.data);
         
       } catch (err) {
         console.error(err);
-        setUserPayload({ user: null, isLoading: false });
+        setUserPayload({ user: null, isLoading: false,fetchUser });
       }
     };
+  useEffect(() => {
+
 
     fetchUser();
   }, []);

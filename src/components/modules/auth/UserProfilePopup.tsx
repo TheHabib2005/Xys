@@ -4,6 +4,7 @@ import { IUser } from '@/interfaces/user'
 import { LayoutDashboard, Settings } from 'lucide-react'
 import Link from 'next/link'
 import LogoutButton from './LogoutButton'
+import UserCreditCard from '../user/UserCreditCard'
 
 
 const UserProfile = ({user}:{user:IUser}) => {
@@ -26,6 +27,8 @@ const UserProfile = ({user}:{user:IUser}) => {
                     <div className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
                       {user.role}
                     </div>
+                        <UserCreditCard/>
+
                   </div>
                   <div className="grid gap-1">
                     <Link href={`/dashboard`}>

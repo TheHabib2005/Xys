@@ -9,6 +9,8 @@ interface Props {
 }
 
 export const EducationStep = ({ data, onChange }: Props) => {
+  console.log(data);
+  
   const addEducation = () => {
     const newEdu: Education = { id: crypto.randomUUID(), institution: "", degree: "", year: "", gpa: "" };
     onChange([newEdu, ...data]);

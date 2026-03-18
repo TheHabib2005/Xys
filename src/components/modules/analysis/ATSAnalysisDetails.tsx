@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import SaveAnalysisResult from "./SaveAnalysisResult";
 
 interface AnalysisPageProps {
   data: any;
@@ -16,6 +17,7 @@ interface AnalysisPageProps {
 
 export default function AnalysisDetails({ data }: AnalysisPageProps) {
   const [activeTab, setActiveTab] = useState("overview");
+
 
   if (!data) return <AnalysisSkeleton />;
 
@@ -38,8 +40,9 @@ export default function AnalysisDetails({ data }: AnalysisPageProps) {
             </h1>
           </div>
           <div className="flex gap-3">
+          <SaveAnalysisResult id={data.id}/>
             <Button variant="outline" className="rounded-xl border-border/60">
-              <Download className="mr-2 h-4 w-4" /> Export JSON
+              <Download className="mr-2 h-4 w-4" /> Generate Report
             </Button>
             <Button className="rounded-xl bg-primary shadow-lg shadow-primary/20">
               <Sparkles className="mr-2 h-4 w-4" /> Optimize with AI

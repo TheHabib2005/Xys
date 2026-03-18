@@ -101,7 +101,6 @@ const handleSubmit = async () => {
 
     // 2. Start Loading State
     setIsUploading(true);
-    const loadingToast = toast.loading("Uploading and analyzing your resume...");
 
     try {
       // 3. Prepare FormData
@@ -136,15 +135,15 @@ const handleSubmit = async () => {
       // 5. Handle Success
       const result = response.data; // Assuming your axios client returns data directly
       console.log(result);
-      
+      toast.success("starting")
       // // Redirect to the processing or results page using the ID from backend
       router.push(`/analysis/${result?.data?.analysisId || result?.analysisId}`);
-
+      
     } catch (error: any) {
       // 6. Handle Errors
       console.error("Analysis Error:", error);
       const errorMessage = error.response?.data?.message || "Failed to upload resume. Please try again.";
-      toast.error(errorMessage, { id: loadingToast });
+
     } finally {
       // 7. Stop Loading State
       setIsUploading(false);

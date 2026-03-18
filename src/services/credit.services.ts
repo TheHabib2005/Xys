@@ -1,7 +1,8 @@
 "use server"
 
+import { serverFetch } from "@/lib/serverFetch"
+
 export const getUserCredit = async ()=>{
-   return  new Promise(res=>setTimeout(() => {
-        res(20)
-    }, 2000))
+ const res = await serverFetch("/wallet/my-blance");
+ return res
 }

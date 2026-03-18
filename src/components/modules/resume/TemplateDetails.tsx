@@ -34,6 +34,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Separator } from "@/components/ui/separator";
 import { useUser } from '@/context/UserContext';
 import { useApiMutation } from '@/hooks/useApiMutation';
+import { getUserCredit } from '@/services/credit.services';
 
 interface TemplateDetailsProps {
   id: string;
@@ -43,7 +44,6 @@ const TemplateDetails = ({ id }: TemplateDetailsProps) => {
   const router = useRouter();
   // --- State for Credit Logic ---
   const {user} = useUser()
-  const [userCredits, setUserCredits] = useState(user.wallet || 0); // Default 0 as requested
   const [showConfirm, setShowConfirm] = useState(false);
   const [showLowCreditAlert, setShowLowCreditAlert] = useState(false);
   const { data, isFetching } = useApiQuery(
@@ -59,31 +59,31 @@ const TemplateDetails = ({ id }: TemplateDetailsProps) => {
     endpoint:"/resume/initlize-resume",
     method:"POST"
   })
+  const checkCredit = useApiMutation({
+    actionName:"initlize-resume",
+    actionType:"SERVER_SIDE",
+    endpoint:"/resume/initlize-resume",
+    method:"POST"
+  })
 
   // --- Handlers ---
-  const handleUseTemplateClick = () => {
-    // if (userCredits < 10) {
-    //   setShowLowCreditAlert(true);
-    // } else {
-      setShowConfirm(true);
-    // }
-  };
+  const handleUseTemplateClick =async () => {
+    if(user.wallet.balance < 10){
+  setShowLowCreditAlert(true)
+return
+}
 
-
-
-
-  const confirmUsage =async () => {
-    // Logic to deduct 10 credits via API would go here
-    setUserCredits(prev => prev - 10);
-
-  
- const result = await initlizeResumeMutation.mutateAsync({
+   const result = await initlizeResumeMutation.mutateAsync({
     templateId:id
  })
+ 
 
    router.push(`/dashboard/templates/${id}/builder/${result.data.id}`);
   
   };
+
+
+
   const template = data?.data;
 
   if (isFetching) return <LoadingSkeleton />;
@@ -236,29 +236,6 @@ const TemplateDetails = ({ id }: TemplateDetailsProps) => {
                </div>
             </div>
           </motion.div>
-           {/* --- CONFIRMATION MODAL --- */}
-      <AlertDialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <AlertDialogContent className="rounded-3xl border-2">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl">Confirm Usage</AlertDialogTitle>
-            <AlertDialogDescription className="text-base">
-              Using the <span className="font-bold text-foreground">"{template.name}"</span> template will deduct 
-              <span className="text-primary font-bold mx-1 text-lg">10 credits</span> from your account. 
-              This action cannot be undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="mt-4 gap-3">
-            <AlertDialogCancel className="rounded-full">Cancel</AlertDialogCancel>
-            <AlertDialogAction 
-              onClick={confirmUsage}
-              className="rounded-full bg-primary px-8"
-            >
-              Confirm & Deduct
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-
       {/* --- LOW CREDIT ALERT --- */}
       <AlertDialog open={showLowCreditAlert} onOpenChange={setShowLowCreditAlert}>
         <AlertDialogContent className="rounded-3xl border-2 border-destructive/20">
@@ -269,7 +246,7 @@ const TemplateDetails = ({ id }: TemplateDetailsProps) => {
             <AlertDialogTitle className="text-2xl">Insufficient Credits</AlertDialogTitle>
             <AlertDialogDescription className="text-base">
               You need <span className="font-bold">10 credits</span> to unlock this template. 
-              Your current balance is <span className="font-bold text-destructive">{userCredits} credits</span>.
+              Your current balance is <span className="font-bold text-destructive">{user?.wallet?.balance} credits</span>.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="mt-6 flex-col sm:flex-row gap-3">

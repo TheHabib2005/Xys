@@ -8,7 +8,7 @@ import SaveAnalysisResult from './SaveAnalysisResult';
 const AnalysisDetailsWrapper = ({id}:{id:string}) => {
 
     const [loading,setLoadign] = useState(false);
-    const [data, setData] = useState(null)
+    const [data, setData] = useState<any>(null)
 
     const fetchData = async()=>{
         const response = await httpClient.post(
@@ -36,10 +36,9 @@ const AnalysisDetailsWrapper = ({id}:{id:string}) => {
 
   return (
     <div>
-{data && <SaveAnalysisResult id={id}/>}
 
  {
-    data && data?.analysis_type === "ATS_SCAN" ? <AnalysisDetails data={data}/> : <JobMatcherDetails data={data}/>
+    data && data?.analysis_type === "ATS_SCAN" ? <AnalysisDetails  data={data}/> : <JobMatcherDetails data={data}/>
  }
 
     </div>

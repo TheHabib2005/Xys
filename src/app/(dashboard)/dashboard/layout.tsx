@@ -1,8 +1,14 @@
 import DashboardHeader from '@/components/modules/user/DashboardHeader'
 import DashboardSidebar from '@/components/modules/user/DashboardSidebar'
 import { SidebarProvider } from '@/components/ui/sidebar'
+
+import { getUserCredit } from '@/services/credit.services'
 import React, { ReactNode } from 'react'
-const layout = ({children}:{children:ReactNode}) => {
+const layout = async({children}:{children:ReactNode}) => {
+
+  
+      const credit = await getUserCredit();
+    
   return (
     <div className='min-h-screen  w-full bg-background'>
           <DashboardHeader />
@@ -13,7 +19,9 @@ const layout = ({children}:{children:ReactNode}) => {
 
          <DashboardSidebar/>
          <div className='w-full'>
-          {children}
+        
+            {children}
+      
          </div>
 
        </div>

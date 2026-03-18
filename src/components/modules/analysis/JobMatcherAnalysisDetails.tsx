@@ -22,62 +22,13 @@ import {
 import { Button } from "@/components/ui/button";
 
 interface JobMatcherProps {
-  id: string;
+  data: any;
 }
 
-export default function JobMatcherDetails({ id }: JobMatcherProps) {
-  const [data, setData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+export default function JobMatcherDetails({ data }: JobMatcherProps) {
 
-  useEffect(() => {
-    const fetchMatchData = async () => {
-      setLoading(true);
-      await new Promise((resolve) => setTimeout(resolve, 2500));
-      
-      const mockResult = {
-        id: id,
-        status: "success",
-        analysis_type: "JOB_MATCHER",
-        match_percentage: 76,
-        match_verdict: "Strong Contender",
-        verdict_description: "Your profile aligns with 80% of core requirements but lacks specific cloud experience required for this squad.",
-        requirement_mapping: [
-          {
-            requirement: "5+ years Frontend Experience",
-            status: "MATCHED",
-            evidence: "4.5 years documented across 3 major SaaS roles including specialized work in Next.js."
-          },
-          {
-            requirement: "Advanced Next.js / SSR",
-            status: "PARTIAL",
-            evidence: "Mentioned in current role, but missing specific metrics like LCP or CLS optimization."
-          },
-          {
-            requirement: "AWS/Cloud Infrastructure",
-            status: "MISSING",
-            evidence: "No mention of AWS, GCP, or Azure in the provided text."
-          }
-        ],
-        top_skill_gaps: [
-          "AWS Amplify / Serverless deployment",
-          "End-to-end testing with Cypress or Playwright",
-          "State management optimization (Zustand/Redux)"
-        ],
-        strategic_advice: {
-          resume_tweak: "Move your 'Projects' section above 'Education' to highlight the Next.js work which is central to this JD.",
-          interview_focus: "Be prepared to explain how you would handle high-traffic SSR in Next.js, as the JD emphasizes scalability.",
-          custom_pitch: "Highlight your AI integration skills—even though it's not a hard requirement, it differentiates you for this specific team."
-        }
-      };
-      
-      setData(mockResult);
-      setLoading(false);
-    };
 
-    fetchMatchData();
-  }, [id]);
-
-  if (loading) return <JobMatcherSkeleton />;
+  if (!data) return <JobMatcherSkeleton />;
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] text-foreground p-4 md:p-8">

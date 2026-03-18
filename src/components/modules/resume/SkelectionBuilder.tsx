@@ -14,7 +14,7 @@ export function SkeletonBuilder() {
       </header>
 
       {/* Main Content Skeleton */}
-      <main className="flex-1 grid grid-cols-1 lg:grid-cols-[1fr_450px] xl:grid-cols-[1fr_550px]">
+      <main className="flex-1 grid grid-cols-1 ">
         
         {/* Left Side: Form Skeleton */}
         <div className="p-4 md:p-8 max-w-3xl mx-auto w-full space-y-10">
@@ -43,27 +43,8 @@ export function SkeletonBuilder() {
           </div>
         </div>
 
-        {/* Right Side: Preview Skeleton (Desktop) */}
-        <div className="hidden lg:block border-l p-4 bg-zinc-50 dark:bg-zinc-900/50">
-          <div className="flex flex-col h-[calc(100vh-100px)] rounded-xl border bg-white dark:bg-zinc-800 overflow-hidden">
-            <div className="px-4 py-3 border-b flex justify-between">
-              <Skeleton className="h-3 w-24" />
-              <Skeleton className="h-3 w-3" />
-            </div>
-            <div className="flex-1 p-8 space-y-6">
-              <Skeleton className="h-12 w-3/4 mx-auto" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-full" />
-                <Skeleton className="h-4 w-2/3" />
-              </div>
-              <div className="pt-10 space-y-4">
-                <Skeleton className="h-20 w-full" />
-                <Skeleton className="h-20 w-full" />
-              </div>
-            </div>
-          </div>
-        </div>
+        
+       
       </main>
     </div>
   );

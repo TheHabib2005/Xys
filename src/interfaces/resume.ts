@@ -44,7 +44,7 @@ export interface ResumeTemplate {
   id: string;
   name: string;
   htmlLayout: string; // The "Handlebars" backtick string
-  sections: string[]; // ['personal', 'summary', 'experience', etc.]
+  sections: any; // ['personal', 'summary', 'experience', etc.]
   thumbnail?: string;
   category: "Professional" | "Modern" | "Creative";
 }

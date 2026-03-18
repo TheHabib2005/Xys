@@ -18,12 +18,14 @@ import { toast } from 'sonner'
 import SocialLogin from './SocialLogin'
 import SignInSuccessLoader from './SuccessLoader'
 import { UserRole } from '@/interfaces/enums'
+import { useUser } from '@/context/UserContext'
+import AppLoader from '@/components/global/AppLoader'
 
 export function SignInForm() {
     const router = useRouter()
     const [mounted, setMounted] = useState(false)
-    const [showLoading, setShowLoading] = useState(false)
-
+    const  [showLoading, setShowLoading] = useState(false)
+  const {fetchUser} = useUser()
     useEffect(() => {
         setMounted(true)
     }, [])
@@ -60,7 +62,8 @@ console.log(result);
                   if(userData.user.role !== UserRole.USER) {
                 router.push("/unauthorize");
                   }
-                router.push("/dashboard");
+                window.location.href = "/dashboard"
+
             }else{
                 toast.error(userData.message)
             setShowLoading(false) // Hide loader if logic fails after success
@@ -78,7 +81,7 @@ console.log(result);
             {/* Full Screen Pre-loader */}
             <AnimatePresence>
                 {showLoading && (
-                   <SignInSuccessLoader/>
+                   <AppLoader/>
                 )}
             </AnimatePresence>
 

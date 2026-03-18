@@ -26,13 +26,14 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
 
+      
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} font-sans mx-auto antialiased bg-background text-foreground`}>
-       
+      
         <Providers>
           <UserContextWrapper>
-          {children}
+       {children}
         </UserContextWrapper>
         </Providers>
       </body>
