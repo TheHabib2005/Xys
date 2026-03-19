@@ -33,3 +33,16 @@ export interface AnalysisResult {
     education: string[];
   };
 }
+export interface AnalysisHistoryItem {
+  id: string;
+  userId: string;
+  analysisType: string;
+  resumeText: string;
+  resumeUrl: string | null;
+  jobData: Record<string, any>;
+  result: {
+    overall_score: number;
+    summary: string;
+  };
+  createdAt: string;
+}
