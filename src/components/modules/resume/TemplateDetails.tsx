@@ -68,7 +68,7 @@ const TemplateDetails = ({ id }: TemplateDetailsProps) => {
 
   // --- Handlers ---
   const handleUseTemplateClick =async () => {
-    if(user.wallet.balance < 10){
+    if(user && user.wallet.balance < 10){
   setShowLowCreditAlert(true)
 return
 }
@@ -84,7 +84,7 @@ return
 
 
 
-  const template = data?.data;
+  const template:any = data?.data;
 
   if (isFetching) return <LoadingSkeleton />;
 

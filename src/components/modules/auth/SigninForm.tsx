@@ -58,11 +58,12 @@ console.log(result);
         try {
             const userData = await signInMutation(data);
             if (userData?.success) {
+                await fetchUser()
                 toast.success("You are Login Successfully")
                   if(userData.user.role !== UserRole.USER) {
-                router.push("/unauthorize");
+                router.push("/admin/dashboard");
                   }
-                window.location.href = "/dashboard"
+                router.push("/dashboard")
 
             }else{
                 toast.error(userData.message)

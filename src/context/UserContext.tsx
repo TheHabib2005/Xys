@@ -3,47 +3,57 @@
 import AppLoader from "@/components/global/AppLoader";
 import { IUser } from "@/interfaces/user";
 import { getMe } from "@/services/auth.services";
-import { createContext, useContext, useEffect, useState } from "react";
-
+import { createContext, useContext, useEffect, useState, useCallback } from "react";
 
 interface IUserContext {
-  user: IUser | null,
-  isLoading:boolean
-  fetchUser?:()=> void
-
+  user: IUser | null;
+  isLoading: boolean;
+  fetchUser: () => Promise<void>;
 }
+
 export const UserContext = createContext<IUserContext | undefined>(undefined);
 
 export default function UserContextWrapper({ children }: { children: React.ReactNode }) {
-  const [userPayload, setUserPayload] = useState<{ user: any; isLoading: boolean;
-    fetchUser?:()=> void
-  }>({
-    user: null,
-    isLoading: true,
-  });
-    const fetchUser = async () => {
-      try {
-        const res = await getMe()
-        setUserPayload({ user: res?.data || null, isLoading: false ,fetchUser:fetchUser});
-        console.log(res?.data);
-        
-      } catch (err) {
-        console.error(err);
-        setUserPayload({ user: null, isLoading: false,fetchUser });
-      }
-    };
-  useEffect(() => {
+  const [user, setUser] = useState<IUser | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-
-    fetchUser();
+  const fetchUser = useCallback(async () => {
+    try {
+      setIsLoading(true);
+      const res = await getMe();
+      const userData = res?.data || null;
+      setUser(userData);
+      console.log(userData);
+    } catch (err) {
+      console.error(err);
+      setUser(null);
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
   // Loading overlay
-  if (userPayload.isLoading) {
-    return <AppLoader/>
+  if (isLoading) {
+    return <AppLoader />;
   }
 
-  return <UserContext.Provider value={userPayload}>{children}</UserContext.Provider>;
+  const contextValue: IUserContext = {
+    user,
+    isLoading,
+    fetchUser
+  };
+
+  return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;
 }
 
-export const useUser = () => { const context = useContext(UserContext); if (context === undefined) { throw new Error('useUser must be used within a UserContextProvider'); } return context; };
+export const useUser = (): IUserContext => {
+  const context = useContext(UserContext);
+  if (context === undefined) {
+    throw new Error('useUser must be used within a UserContextProvider');
+  }
+  return context;
+};

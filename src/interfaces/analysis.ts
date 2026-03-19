@@ -19,7 +19,7 @@ export interface FeedbackCard {
 }
 
 export interface AnalysisResult {
-  analysisId: string;
+  id: string;
   fileId: string;
   atsScore: number;
   skillMatchScore: number;

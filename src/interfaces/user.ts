@@ -1,6 +1,25 @@
+import { AnalysisResult } from "./analysis";
 
 
 export interface IUser {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+  contactNumber: string;
+  location: string;
+  experienceLevel: string;
+  profession: string;
+  profileAvatar:string
+  analysisHistory:AnalysisResult[]
+  wallet:{
+    balance:number
+  }
+  user:IBaseUser
+}
+
+
+export interface IBaseUser {
   id: string;
   name: string;
   email: string;
@@ -17,4 +36,3 @@ export interface IUser {
   sessions?: any[];
   accounts?: any[];
 }
-

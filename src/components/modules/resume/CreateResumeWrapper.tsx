@@ -63,10 +63,10 @@ export default function CreateResumeWrapper() {
     { staleTime: 1000 * 60 * 5 }
   );
 
-  const templates: TemplateData[] = data?.data || [];
+  const templates: TemplateData[] | any = data?.data || [];
 
   // --- Filtering Logic ---
-  const filtered = templates.filter((t) => {
+  const filtered = templates.filter((t:TemplateData) => {
     // Note: Since 'category' isn't explicitly in your JSON root but in descriptions, 
     // we match against the 'slug' or 'name' for this example.
     const matchesCategory = category === "all" || t.slug.includes(category) || t.name.toLowerCase().includes(category);
@@ -188,7 +188,7 @@ export default function CreateResumeWrapper() {
               Array.from({ length: 4 }).map((_, i) => <TemplateSkeleton key={i} />)
             ) : (
               <AnimatePresence mode="popLayout">
-                {filtered.map((template) => (
+                {filtered.map((template:TemplateData) => (
                   <motion.div
                     key={template.id}
                     layout

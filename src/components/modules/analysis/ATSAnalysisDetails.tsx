@@ -19,7 +19,7 @@ export default function AnalysisDetails({ data }: AnalysisPageProps) {
   const [activeTab, setActiveTab] = useState("overview");
 
 
-  if (!data) return <AnalysisSkeleton />;
+  if (!data) return <h1>not found</h1>
 
   return (
     <div className="min-h-screen bg-[#fafafa] dark:bg-[#050505] text-foreground p-4 md:p-8">

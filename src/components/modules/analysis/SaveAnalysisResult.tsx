@@ -2,13 +2,14 @@
 import { Button } from '@/components/ui/button'
 import { useUser } from '@/context/UserContext'
 import { useApiMutation } from '@/hooks/useApiMutation'
+import { AnalysisResult } from '@/interfaces/analysis'
 import { File, Loader, Store } from 'lucide-react'
 import React from 'react'
 
 const SaveAnalysisResult = ({id}:{id:string}) => {
 
     const {user,isLoading} = useUser()
-    console.log(user);
+  
     
 
     const {isPending,mutateAsync} = useApiMutation({
@@ -23,14 +24,18 @@ const SaveAnalysisResult = ({id}:{id:string}) => {
         await mutateAsync({})
     }
 
+    
+    const isAlreadySaved = user?.analysisHistory.map((item:AnalysisResult) => item.id === id).length ? true : false
+
+
   return (
 <div>
         <Button
     onClick={handleSaveDetails}
-    disabled={isPending || isLoading || !user}
+    disabled={ isAlreadySaved || isPending || isLoading || !user}
     >
   {isPending ? <>
-  <Loader className='mr-3'/> <p>Saving Analysis</p>
+  <Loader className='mr-3 animate-spin'/> <p>Saving Analysis</p>
   </> :     <>
   <Store className='mr-3'/> <p>Save Analysis</p></>}
     </Button>

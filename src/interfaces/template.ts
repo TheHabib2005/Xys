@@ -18,9 +18,7 @@ export interface ResumeTemplate {
   resumeData?: any;           // optional default data for the form
 }
 
-// ===========================================
-// Section definition
-// ===========================================
+
 interface Section {
   key: string;                // unique within template (e.g., "experience")
   label: string;              // user-facing label

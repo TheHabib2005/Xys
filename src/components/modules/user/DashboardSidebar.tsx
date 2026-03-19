@@ -32,7 +32,7 @@ const navItems = [
   { path: "/dashboard/profile", label: "Profile", icon: User },
   { path: "/dashboard/templates", label: "Explor Templates", icon: LucideBookTemplate },
   { path: "/dashboard/resumes", label: "My Resumes", icon: FilePlus },
-  { path: "/profile/history", label: "History", icon: History },
+  { path: "/dashboard/history", label: "Analysis History", icon: History },
   { path: "/profile/plans", label: "Plans", icon: CreditCard },
   { path: "/profile/settings", label: "Settings", icon: Settings },
 ];

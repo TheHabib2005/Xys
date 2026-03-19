@@ -40,22 +40,22 @@ httpClient.interceptors.response.use(
         //   } }
         // );
          const refreshTokenCookie = await getCookie("refreshToken");
-         alert(refreshTokenCookie)
-        //  if(!refreshTokenCookie){
-        //   window.location.href = '/sign-in'; // বা আপনার লগইন রাউট
-        //   return
-        //  }
+   
+         if(!refreshTokenCookie){
+          window.location.href = '/sign-in'; // বা আপনার লগইন রাউট
+          return
+         }
         const updatedToken = await refreshAccessToken(refreshTokenCookie!)
         console.log(updatedToken)
         
-        //  if(updatedToken){
+         if(updatedToken){
 
-        //    // ২. রিফ্রেশ সাকসেস হলে অরিজিনাল রিকোয়েস্টটি আবার পাঠান
-        //    // ইন্টারসেপ্টর এখানেই রিকোয়েস্টটি মিটিয়ে ফেলবে, কম্পোনেন্ট জানবেও না যে এরর হয়েছিল
-        //    return httpClient(originalRequest); 
-        //  }else{
-        //   window.location.href = '/sign-in'; // বা আপনার লগইন রাউট
-        //  }
+           // ২. রিফ্রেশ সাকসেস হলে অরিজিনাল রিকোয়েস্টটি আবার পাঠান
+           // ইন্টারসেপ্টর এখানেই রিকোয়েস্টটি মিটিয়ে ফেলবে, কম্পোনেন্ট জানবেও না যে এরর হয়েছিল
+           return httpClient(originalRequest); 
+         }else{
+          window.location.href = '/sign-in'; // বা আপনার লগইন রাউট
+         }
       } catch (refreshError) {
         // ৩. যদি রিফ্রেশ ফেইল করে (ইউজার ব্লকড বা সেশন শেষ)
         console.error("Refresh token expired or failed. Redirecting to login...");
