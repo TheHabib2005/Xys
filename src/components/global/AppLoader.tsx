@@ -25,8 +25,8 @@ export default function AppLoader() {
           />
         </div>
         <div className="text-center">
-          <h2 className="font-display text-2xl font-bold text-gradient-primary">Blitz AI</h2>
-          <p className="mt-2 text-sm text-muted-foreground">Preparing your workspace...</p>
+          <h2 className="font-display text-2xl font-bold text-gradient-primary">Blitz Analyzer</h2>
+          <p className="mt-2 text-sm text-muted-foreground">Ultimite Resume Killer</p>
         </div>
         <div className="flex gap-1.5">
           {[0, 1, 2].map((i) => (

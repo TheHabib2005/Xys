@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 
   applicationName: "Blitz Analyzer",
   title: {
-    default: "AI Resume Builder - Create ATS Friendly Resume",
+    default: "Blitz Analyzer - Shine Your Resume",
     template: "%s | AI Resume Builder"
   },
 

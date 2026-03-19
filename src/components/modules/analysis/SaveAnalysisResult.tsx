@@ -25,7 +25,8 @@ const SaveAnalysisResult = ({id}:{id:string}) => {
     }
 
     
-    const isAlreadySaved = user?.analysisHistory.map((item:AnalysisResult) => item.id === id).length ? true : false
+    const findAnalysis = user?.analysisHistory.filter((item:AnalysisResult) => item.id === id);
+    const isAlreadySaved = findAnalysis && findAnalysis.length > 0 
 
 
   return (

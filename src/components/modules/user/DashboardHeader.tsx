@@ -11,7 +11,8 @@ import {
   LogOut, 
   Sun, 
   Moon, 
-  ChevronDown 
+  ChevronDown, 
+  Bolt
 } from "lucide-react";
 import { useTheme } from "next-themes";
 
@@ -39,9 +40,7 @@ export default function DashboardHeader() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // const credit =
-
-  // Prevent hydration mismatch for theme icons
+ 
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -56,12 +55,20 @@ export default function DashboardHeader() {
       <div className="flex h-14 items-center justify-between px-4">
         
         {/* Left Section: Sidebar & Logo */}
-        <div className="flex items-center gap-3">
-          <SidebarTrigger className="text-muted-foreground hover:text-foreground transition-colors" />
-          <div className="hidden sm:block">
-            <Logo size="sm" />
-          </div>
-        </div>
+       <div className="flex items-center gap-3">
+  <SidebarTrigger className="h-9 w-9 rounded-full border border-border bg-background/50 backdrop-blur-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-all flex items-center justify-center" />
+  <div className="hidden sm:flex items-center gap-2">
+    <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5">
+      <Bolt className="h-5 w-5 text-primary" />
+    </div>
+    <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+      Blitz Analyzer
+    </span>
+    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+      PRO
+    </span>
+  </div>
+</div>
 
         {/* Center Section: Navigation Link Buttons */}
         <nav className="hidden md:flex items-center gap-1">

@@ -58,13 +58,14 @@ console.log(result);
         try {
             const userData = await signInMutation(data);
             if (userData?.success) {
-                await fetchUser()
+               
                 toast.success("You are Login Successfully")
                   if(userData.user.role !== UserRole.USER) {
                 router.push("/admin/dashboard");
+                  }else{
+                    router.push("/dashboard")
                   }
-                router.push("/dashboard")
-
+ await fetchUser()
             }else{
                 toast.error(userData.message)
             setShowLoading(false) // Hide loader if logic fails after success

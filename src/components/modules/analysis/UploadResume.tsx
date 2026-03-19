@@ -33,6 +33,8 @@ const analysisOptions = [
     label: "ATS Resume Scan",
     desc: "Deep-scan your resume for ATS compatibility, formatting issues, and keyword density",
     features: ["ATS score analysis", "Format validation", "Keyword density check"],
+    disabled:false
+
   },
   {
     type: AnalysisType.JOB_MATCHER,
@@ -40,6 +42,7 @@ const analysisOptions = [
     label: "Job Match Analysis",
     desc: "Compare your resume against a specific job posting for tailored feedback",
     features: ["Skill gap detection", "Keyword matching", "Requirement alignment"],
+    disabled:true
   },
 ];
 
@@ -227,7 +230,7 @@ const handleSubmit = async () => {
               {analysisOptions.map((opt) => {
                 const isActive = analysisType === opt.type;
                 return (
-                  <motion.button key={opt.type} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
+                  <motion.button disabled={opt.disabled} key={opt.type} whileHover={{ scale: 1.01 }} whileTap={{ scale: 0.99 }}
                     onClick={() => setAnalysisType(opt.type)}
                     className={`relative flex flex-col items-start gap-3 rounded-2xl border p-6 text-left transition-all duration-300 ${
                       isActive ? "border-primary bg-primary/5 ring-1 ring-primary/20" : "border-border bg-card/50 backdrop-blur-sm hover:border-primary/30 hover:bg-card/80"
@@ -246,6 +249,8 @@ const handleSubmit = async () => {
                         <span key={f} className={`rounded-full px-2.5 py-0.5 text-xs ${isActive ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground"}`}>{f}</span>
                       ))}
                     </div>
+
+                    <span className="text-center text-red-800 font-semibold">{opt.type === "JOB_MATCHER" && "This Service is Tempory Disabled "}</span>
                   </motion.button>
                 );
               })}
@@ -256,7 +261,7 @@ const handleSubmit = async () => {
           <AnimatePresence mode="wait">
             {isJobMatch && (
               <motion.div key="job-match-fields" initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: "auto" }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                <div className="mt-8 space-y-5 rounded-2xl border border-primary/10 bg-primary/[0.02] p-6">
+                <div  className="mt-8 space-y-5 rounded-2xl border border-primary/10 bg-primary/[0.02] p-6">
                   <div className="mb-2 flex items-center gap-2">
                     <Sparkles className="h-4 w-4 text-primary" />
                     <span className="text-sm font-medium text-primary">Job Match Details</span>

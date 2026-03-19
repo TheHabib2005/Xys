@@ -65,9 +65,6 @@ interface ApiResponse {
   meta: { timestamp: string };
 }
 
-// ----------------------------------------------------------------------
-// Skeleton Row Component
-// ----------------------------------------------------------------------
 function SkeletonRow() {
   return (
     <div className="grid grid-cols-12 gap-4 px-6 py-5 items-center border-b border-border/40">
@@ -96,9 +93,6 @@ function SkeletonRow() {
   );
 }
 
-// ----------------------------------------------------------------------
-// Main Component
-// ----------------------------------------------------------------------
 export default function AnalysisHistoryWrapper() {
   const { user } = useUser();
   const router = useRouter();
@@ -107,7 +101,10 @@ export default function AnalysisHistoryWrapper() {
   const { data, isFetching, isError } = useApiQuery<ApiResponse>(
     [cacheKey],
     '/analyzer/get-analysis-history',
-    'axios'
+    'axios',{
+      refetchOnWindowFocus:false,
+      staleTime:2*1000
+    }
   );
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -351,14 +348,7 @@ export default function AnalysisHistoryWrapper() {
 
                     {/* Actions */}
                     <div className="col-span-6 md:col-span-3 flex justify-end items-center gap-1">
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8 text-muted-foreground hover:text-primary"
-                        onClick={() => router.push(`/analysis/${item.id}`)}
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </Button> 
+                       
                       {item.resumeUrl && (
                         <Button
                           variant="ghost"
@@ -439,17 +429,7 @@ export default function AnalysisHistoryWrapper() {
               </div>
             </CardContent>
           </Card>
-          <Card className="bg-primary text-primary-foreground">
-            <CardContent className="p-5 flex items-center justify-between">
-              <div>
-                <p className="text-xs font-bold uppercase opacity-80 tracking-tighter">Plan</p>
-                <p className="text-xl font-bold italic">Pro Analyst</p>
-              </div>
-              <Button variant="secondary" size="sm" className="rounded-full font-bold">
-                Upgrade
-              </Button>
-            </CardContent>
-          </Card>
+        
         </div>
       )}
     </div>
