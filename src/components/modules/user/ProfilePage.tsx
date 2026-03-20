@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
+import ClaimFreeCredits from "./ClamFreeCredit";
 
 // ----------------------------------------------------------------------
 // AvatarUpload Component
@@ -145,6 +146,8 @@ export default function AccountPage() {
   if (isLoading) {
     return (
       <div className="max-w-4xl mx-auto w-full px-4 py-6 md:py-8">
+        // Inside your Navbar component, after the logo or before the theme switch:
+
         <div className="space-y-6">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-72" />
@@ -175,8 +178,15 @@ export default function AccountPage() {
 
   return (
     <div className="max-w-4xl mx-auto w-full px-4 py-6 md:py-8">
+
+{!user?.isFreeCreditClaim && <ClaimFreeCredits onCreditsAdded={(credits) => {
+  // Update user credits in your state/context
+  // e.g., setUser(prev => ({ ...prev, credits: prev.credits + credits }));
+  toast.success(`${credits} credits added to your account!`);
+}} />}
+
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <h1 className="font-display text-2xl font-bold tracking-tight">Profile</h1>
+        <h1 className="font-display text-2xl font-bold tracking-tight mt-5">Profile</h1>
         <p className="mt-1 text-muted-foreground">Manage your personal information and preferences</p>
       </motion.div>
 
