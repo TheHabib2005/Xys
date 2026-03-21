@@ -134,11 +134,7 @@ export default function AccountPage() {
   return (
     <div className="max-w-4xl mx-auto w-full px-4 py-6 md:py-8">
 
-{!user?.isFreeCreditClaim && <ClaimFreeCredits onCreditsAdded={(credits) => {
-  // Update user credits in your state/context
-  // e.g., setUser(prev => ({ ...prev, credits: prev.credits + credits }));
-  toast.success(`${credits} credits added to your account!`);
-}} />}
+{!user?.isFreeCreditClaim && <ClaimFreeCredits userId={user?.id}/>}
 
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <h1 className="font-display text-2xl font-bold tracking-tight mt-5">Profile</h1>

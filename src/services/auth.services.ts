@@ -30,7 +30,7 @@ export const getProfile = async (): Promise<{ user: { data: any } } | null> => {
 
 export const getMe = async ()=>{
 try {
-    let data = await serverFetch("/auth/me",{},"profile-data");
+    let data = await serverFetch("/auth/me",{});
   return data
 } catch (error) {
   console.log(error);

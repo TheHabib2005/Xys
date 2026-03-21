@@ -28,7 +28,7 @@ async function refreshAccessToken(cookiesStore: string): Promise<string | null> 
 
 export async function serverFetch(path: string, options: RequestInit = {},revalidate: number | false = 3600) {
     const cookieStore = await cookies()
-
+console.log(`🌐 FETCH: ${path}`);
     let res = await fetch(`${envVeriables.API_URL}${path}`, {
         ...options,
         headers: {
@@ -42,6 +42,9 @@ export async function serverFetch(path: string, options: RequestInit = {},revali
             tags: [path] // Useful for on-demand revalidation later
         }
     })
+
+const cacheStatus = res.headers.get('x-nextjs-cache');
+    console.log(`🌐 FETCH: ${path} | Cache: ${cacheStatus || 'N/A'}`);
 
 
 
@@ -69,3 +72,4 @@ export async function serverFetch(path: string, options: RequestInit = {},revali
 
     return JSON.parse(JSON.stringify(data));
 }
+

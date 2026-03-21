@@ -24,6 +24,8 @@ import {
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { CheckCircle2, ArrowRight, Sparkles, Loader2 } from "lucide-react";
 import { toast } from "sonner"; // or any toast library
+import httpClient from "@/lib/axios-client";
+import { refreshWallet } from "@/services/credit.services";
 
 // ----------------------------------------------------------------------
 // Types for the onboarding form data
@@ -129,10 +131,11 @@ const Step3 = ({ data, updateData }: { data: OnboardingData; updateData: (d: Par
 // Main component: ClaimFreeCredits
 // ----------------------------------------------------------------------
 interface ClaimFreeCreditsProps {
-  onCreditsAdded?: (credits: number) => void; // callback to update credits in parent
+  userId?: string; // callback to update credits in parent
 }
 
-export default function ClaimFreeCredits({ onCreditsAdded }: ClaimFreeCreditsProps) {
+export default function ClaimFreeCredits({ userId }: ClaimFreeCreditsProps) {
+  const {user,setUser} = useUser()
   const [isOpen, setIsOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -175,28 +178,23 @@ export default function ClaimFreeCredits({ onCreditsAdded }: ClaimFreeCreditsPro
   };
 
   // Submit onboarding
+  "use client"
   const handleSubmit = async () => {
-    setIsSubmitting(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    // Here you would normally call your backend to add credits
-    // For demo, we'll just call the callback
-    onCreditsAdded?.(10); // Add 10 credits
-    setIsSubmitting(false);
-    setShowSuccess(true);
-    // Auto-close after 2 seconds
-    setTimeout(() => {
-      setIsOpen(false);
-      setShowSuccess(false);
-      setCurrentStep(1);
-      setFormData({
-        role: "",
-        experience: "",
-        goal: "",
-        biggestChallenge: "",
-        howDidYouHear: "",
-      });
-    }, 2000);
+try {
+      setIsSubmitting(true);
+    const payload= {}
+    const result = await httpClient.post("/wallet/claim-free-credit",payload);
+    if(result.data?.success){
+      setShowSuccess(true);
+      await refreshWallet();
+      setUser((prev)=>({...prev,isFreeCreditClaim:true}));
+    }
+} catch (error) {
+  
+}finally{
+       setIsSubmitting(false);
+}
+ 
   };
 
   // Modal content based on state
