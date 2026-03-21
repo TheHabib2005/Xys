@@ -187,7 +187,7 @@ try {
     if(result.data?.success){
       setShowSuccess(true);
       await refreshWallet();
-      setUser((prev)=>({...prev,isFreeCreditClaim:true}));
+      setUser((prev:any)=>({...prev,isFreeCreditClaim:true}));
     }
 } catch (error) {
   

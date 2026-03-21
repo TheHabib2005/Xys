@@ -2,127 +2,174 @@
 
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
-import { 
-  LayoutDashboard, 
-  User, 
-  Settings, 
-  CreditCard, 
-  Upload, 
-  LogOut, 
-  Sun, 
-  Moon, 
-  ChevronDown, 
+import {
+  Upload,
+  Sun,
+  Moon,
   Bolt
 } from "lucide-react";
+import { motion } from "framer-motion";
 import { useTheme } from "next-themes";
 
 import { Button } from "@/components/ui/button";
-import Logo from "@/components/global/Logo";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import UserProfile from "../auth/UserProfilePopup";
-import UserCreditCard from "./UserCreditCard";
 
 export default function DashboardHeader() {
   const router = useRouter();
   const pathname = usePathname();
-  const { user,  } = useUser();
+  const { user } = useUser();
   const { theme, setTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
 
- 
+  const [mounted, setMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
   useEffect(() => {
     setMounted(true);
+
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-
-
-
-
+  const navLinks = [
+    { label: "Dashboard", path: "/profile" },
+    { label: "Upload", path: "/upload" },
+    { label: "Pricing", path: "/pricing" },
+  ];
 
   return (
-    <header className="w-full sticky top-0 z-40 border-b border-border bg-card/80 backdrop-blur-xl">
-      <div className="flex h-14 items-center justify-between px-4">
-        
-        {/* Left Section: Sidebar & Logo */}
-       <div className="flex items-center gap-3">
-  <SidebarTrigger className="h-9 w-9 rounded-full border border-border bg-background/50 backdrop-blur-sm text-muted-foreground hover:bg-accent hover:text-foreground transition-all flex items-center justify-center" />
-  <div className="hidden sm:flex items-center gap-2">
-    <div className="p-1.5 rounded-lg bg-gradient-to-br from-primary/20 to-primary/5">
-      <Bolt className="h-5 w-5 text-primary" />
-    </div>
-    <span className="font-bold text-xl tracking-tight bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-      Blitz Analyzer
-    </span>
-    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-      PRO
-    </span>
-  </div>
-</div>
+    <header
+      className={cn(
+        "sticky top-0 z-50 w-full transition-all duration-300",
+        "backdrop-blur-xl border-b",
+        "border-b border-border/60  bg-[#f3f3f3] dark:bg-[#01020c]"
+      )}
+    >
+      <div className="flex h-16 items-center justify-between px-4 md:px-6">
 
-        {/* Center Section: Navigation Link Buttons */}
-        <nav className="hidden md:flex items-center gap-1">
-          {[
-            { label: "Dashboard", path: "/profile" },
-            { label: "Upload", path: "/upload" },
-            { label: "Pricing", path: "/pricing" },
-          ].map((link) => (
-            <Button 
-              key={link.path} 
-              variant="ghost" 
-              size="sm" 
-              onClick={() => router.push(link.path)}
-              className={cn(
-                "transition-colors rounded-[var(--radius)]",
-                pathname === link.path ? "text-primary bg-primary/5" : "text-muted-foreground"
-              )}
-            >
-              {link.label}
-            </Button>
-          ))}
+        {/* 🔷 LEFT: Logo + Sidebar */}
+        <div className="flex items-center gap-3">
+
+          <SidebarTrigger className="h-9 w-9 rounded-xl border bg-background/50 hover:bg-accent transition" />
+
+          {/* Logo */}
+          <div className="flex items-center gap-2 cursor-pointer"
+            onClick={() => router.push("/")}
+          >
+            <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
+              <Bolt className="h-5 w-5 text-primary" />
+            </div>
+
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
+                Blitz Analyzer
+              </span>
+
+              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                PRO
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {/* 🔶 CENTER: Navigation */}
+        <nav className="hidden md:flex items-center gap-2 relative">
+
+          {navLinks.map((link) => {
+            const active = pathname === link.path;
+
+            return (
+              <button
+                key={link.path}
+                onClick={() => router.push(link.path)}
+                className={cn(
+                  "relative px-3 py-1.5 text-sm font-medium rounded-lg transition",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
+                )}
+              >
+                {link.label}
+
+                {/* Active Indicator */}
+                {active && (
+                  <motion.div
+                    layoutId="nav-indicator"
+                    className="absolute inset-0 rounded-lg bg-primary/10 border border-primary/20"
+                    transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                  />
+                )}
+              </button>
+            );
+          })}
         </nav>
 
-        {/* Right Section: Actions & Profile */}
+        {/* 🔷 RIGHT: Actions */}
         <div className="flex items-center gap-2">
-          <Button 
-            size="sm" 
-            className="hidden sm:inline-flex bg-primary text-primary-foreground shadow-lg shadow-primary/20" 
+
+          {/* CTA */}
+          <Button
+            size="sm"
             onClick={() => router.push("/upload")}
+            className="hidden sm:flex items-center gap-2 shadow-lg shadow-primary/20"
           >
-            <Upload className="mr-1.5 h-3.5 w-3.5" /> New Analysis
+            <Upload className="h-4 w-4" />
+            New Analysis
           </Button>
 
+          {/* Theme Toggle */}
           {mounted && (
-            <Button 
-              variant="ghost" 
-              size="icon" 
-              className="h-9 w-9 rounded-full" 
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-xl"
               onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             >
               {theme === "dark" ? (
-                <Sun className="h-4 w-4 text-muted-foreground" />
+                <Sun className="h-4 w-4" />
               ) : (
-                <Moon className="h-4 w-4 text-muted-foreground" />
+                <Moon className="h-4 w-4" />
               )}
             </Button>
           )}
 
-       
-
-         {
-          user ? <UserProfile user={user}/> : <Button>SignIn</Button>
-         }
+          {/* User */}
+          {user ? (
+            <UserProfile user={user} />
+          ) : (
+            <Button variant="outline" size="sm">
+              Sign In
+            </Button>
+          )}
         </div>
+      </div>
+
+      {/* 📱 Mobile Bottom Nav */}
+      <div className="md:hidden border-t border-border/50 flex justify-around py-2 bg-background/80 backdrop-blur">
+        {navLinks.map((link) => {
+          const active = pathname === link.path;
+
+          return (
+            <button
+              key={link.path}
+              onClick={() => router.push(link.path)}
+              className={cn(
+                "text-xs font-medium px-3 py-1 rounded-md",
+                active
+                  ? "text-primary bg-primary/10"
+                  : "text-muted-foreground"
+              )}
+            >
+              {link.label}
+            </button>
+          );
+        })}
       </div>
     </header>
   );
