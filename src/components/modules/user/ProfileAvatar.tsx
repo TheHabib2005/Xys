@@ -5,89 +5,100 @@ import { Camera, Loader2, Upload, Check, X } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { motion, AnimatePresence } from "framer-motion";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { motion } from "framer-motion";
+import httpClient from "@/lib/axios-client";
+import { ApiResponse } from "@/interfaces/response";
+import { IBaseUser, IUser } from "@/interfaces/user";
 
 interface AvatarUploadProps {
   imageUrl?: string | null;
   initials: string;
-  onUpload: (file: File) => Promise<string>;
+  onUpload: (uploadedUrl: string) => Promise<ApiResponse<IBaseUser>>;
+  refetch:any
 }
 
-type Status = "idle" | "preview" | "uploading" | "success";
+type Status = "idle" | "generating_preview" | "preview_ready" | "uploading" | "success";
 
-export function AvatarUpload({
-  imageUrl,
-  initials,
-  onUpload,
-}: AvatarUploadProps) {
+export function AvatarUpload({ imageUrl, initials, onUpload,refetch }: AvatarUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
-
   const [status, setStatus] = useState<Status>("idle");
   const [preview, setPreview] = useState<string | null>(null);
+  const [profileImage, setProfileImage] = useState<string | null>(imageUrl || null);
   const [file, setFile] = useState<File | null>(null);
-
-  // Clean up object URL on unmount or when preview changes
+  
+  const requestAbort = new AbortController();
+  // Clean up preview URLs to prevent memory leaks
   useEffect(() => {
     return () => {
-      if (preview) URL.revokeObjectURL(preview);
+      if (preview && preview.startsWith("blob:")) URL.revokeObjectURL(preview);
     };
   }, [preview]);
 
-  // 1️⃣ SELECT FILE
-  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const selected = e.target.files?.[0];
-    if (!selected) return;
+  // 1. SELECT FILE: Uploads immediately to get a server preview URL
+  const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
 
-    // Clean up previous preview if any
-    if (preview) URL.revokeObjectURL(preview);
+    setFile(selectedFile);
+    setStatus("generating_preview");
 
-    const objectUrl = URL.createObjectURL(selected);
-    setFile(selected);
-    setPreview(objectUrl);
-    setStatus("preview");
-  };
-
-  // 2️⃣ CONFIRM UPLOAD
-  const handleConfirm = async () => {
-    if (!file) return;
-
-    setStatus("uploading");
+    const formData = new FormData();
+  formData.append("avatar", selectedFile); 
 
     try {
-      await onUpload(file);
-      setStatus("success");
-      toast.success("Profile picture updated");
-
-      // Close modal after success animation
-      setTimeout(() => {
-        setStatus("idle");
-        setPreview(null);
-        setFile(null);
-        // Reset file input so the same file can be selected again
-        if (fileInputRef.current) fileInputRef.current.value = "";
-      }, 1200);
-    } catch {
-      toast.error("Upload failed");
-      setStatus("preview"); // Stay in preview mode so user can retry or cancel
+      // Fetching the preview/temp URL from your API
+      const response = await httpClient.post("/upload-media/upload-avatar", formData,{
+        headers:{
+           "Content-Type": "multipart/form-data", // This is crucial
+           
+        },
+        signal:requestAbort.signal
+      });
+      
+      // Assume the API returns { secure_url: "..." }
+      setPreview(response.data.secure_url); 
+      setStatus("preview_ready");
+    } catch (error) {
+      toast.error("Failed to process image");
+      reset();
     }
   };
 
-  // 3️⃣ CANCEL
-  const handleCancel = () => {
-    if (preview) URL.revokeObjectURL(preview);
+  // 2. CONFIRM: Finalize the upload
+  const handleConfirm = async () => {
+    if (!file) return;
+    setStatus("uploading");
+
+    try {
+     const savedResult = await onUpload(preview as string);
+       if(savedResult.success){
+        console.log(savedResult);
+        
+         setStatus("success");
+         setProfileImage(savedResult.data?.image!)
+      toast.success("Profile picture updated");
+      setTimeout(reset, 2000); // Close modal after 2 seconds
+       }else{
+      toast.error("Failed to save profileAvatar");
+       }
+    } catch (error) {
+           toast.error("Failed to save profileAvatar");
+      setStatus("preview_ready");
+    }
+  };
+
+  const reset = () => {
+    setStatus("idle");
     setPreview(null);
     setFile(null);
-    setStatus("idle");
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  // Determine if avatar click should be allowed
-  const isAvatarClickable = status === "idle";
-
   return (
     <>
-      {/* Avatar */}
-      <div className="relative group w-fit">
+      {/* Trigger Button */}
+      <div className="relative group w-fit cursor-pointer">
         <input
           type="file"
           ref={fileInputRef}
@@ -95,81 +106,93 @@ export function AvatarUpload({
           accept="image/*"
           className="hidden"
         />
-
-        <div
-          onClick={() => {
-            if (isAvatarClickable) fileInputRef.current?.click();
-          }}
-          className={isAvatarClickable ? "cursor-pointer" : "cursor-default"}
-        >
-          <Avatar className="h-20 w-20 ring-2 ring-border group-hover:ring-primary transition">
-            <AvatarImage src={imageUrl || undefined} />
-            <AvatarFallback>{initials}</AvatarFallback>
+        <div onClick={() => status === "idle" && fileInputRef.current?.click()}>
+          <Avatar className="h-24 w-24 ring-2 ring-border transition group-hover:ring-primary">
+            <AvatarImage src={profileImage || undefined} />
+            <AvatarFallback className="text-lg bg-muted">{initials}</AvatarFallback>
           </Avatar>
-
-          {/* Hover overlay – shows status icon */}
-          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition">
-            {status === "uploading" ? (
-              <Loader2 className="h-5 w-5 animate-spin text-white" />
-            ) : status === "success" ? (
-              <Check className="h-5 w-5 text-green-400" />
-            ) : (
-              <Camera className="h-5 w-5 text-white" />
-            )}
+          <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+            <Camera className="h-6 w-6 text-white" />
           </div>
         </div>
       </div>
 
-      {/* Modal – shown when preview is available and status is not idle/success */}
-      <AnimatePresence>
-        {(status === "preview" || status === "uploading") && preview && (
-          <motion.div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-          >
-            <motion.div
-              initial={{ scale: 0.9, y: 20 }}
-              animate={{ scale: 1, y: 0 }}
-              exit={{ scale: 0.9, y: 20 }}
-              className="bg-white rounded-2xl p-6 w-[340px] text-center space-y-5 shadow-xl"
-            >
-              <h3 className="font-semibold text-lg">
-                {status === "uploading" ? "Uploading..." : "Preview Image"}
-              </h3>
+      {/* Upload Modal */}
+      <Dialog open={status !== "idle"} 
+      onOpenChange={(open) => {
 
-              <img
-                src={preview}
-                alt="preview"
-                className="w-32 h-32 object-cover rounded-full mx-auto border"
-              />
+    if (open) {
 
-              {status === "uploading" ? (
-                <div className="flex justify-center">
-                  <Loader2 className="h-6 w-6 animate-spin text-primary" />
+      if (status === "uploading") return;
+
+
+      reset(); 
+    }
+  }}
+      >
+        <DialogContent className="sm:max-w-[380px] overflow-hidden">
+          <div className="flex flex-col items-center justify-center py-6 space-y-6">
+            
+            {/* STATE: GENERATING PREVIEW (Initial API Call) */}
+            {status === "generating_preview" && (
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center space-y-4">
+                <div className="h-32 w-32 rounded-full bg-muted flex items-center justify-center">
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
                 </div>
-              ) : (
-                <>
-                  <p className="text-sm text-muted-foreground">
-                    Do you want to upload this image?
-                  </p>
-                  <div className="flex gap-3 justify-center">
-                    <Button variant="outline" onClick={handleCancel}>
-                      <X className="h-4 w-4 mr-1" />
-                      Cancel
-                    </Button>
-                    <Button onClick={handleConfirm}>
-                      <Upload className="h-4 w-4 mr-1" />
-                      Confirm
-                    </Button>
-                  </div>
-                </>
-              )}
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+                <p className="font-medium">Processing your image...</p>
+              </motion.div>
+            )}
+
+            {/* STATE: PREVIEW READY OR FINAL UPLOADING */}
+            {(status === "preview_ready" || status === "uploading") && (
+              <motion.div initial={{ scale: 0.9 }} animate={{ scale: 1 }} className="text-center space-y-6 w-full">
+                <div className="relative mx-auto w-40 h-40">
+                  <img
+                    src={preview || ""}
+                    alt="Preview"
+                    className={`w-full h-full object-cover rounded-full border-4 border-background shadow-lg ${
+                      status === "uploading" ? "brightness-50 blur-[2px]" : ""
+                    }`}
+                  />
+                  {status === "uploading" && (
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <Loader2 className="h-10 w-10 animate-spin text-white" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-4">
+                  <h3 className="text-lg font-semibold">
+                    {status === "uploading" ? "Saving..." : "Use this photo?"}
+                  </h3>
+                  
+                  {status === "preview_ready" && (
+                    <div className="flex gap-3">
+                      <Button variant="outline" className="flex-1" onClick={reset}>
+                        <X className="h-4 w-4 mr-2" /> Cancel
+                      </Button>
+                      <Button className="flex-1" onClick={handleConfirm}>
+                        <Upload className="h-4 w-4 mr-2" /> Confirm
+                      </Button>
+                    </div>
+                  )}
+                </div>
+              </motion.div>
+            )}
+
+            {/* STATE: SUCCESS */}
+            {status === "success" && (
+              <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }} className="text-center space-y-4">
+                <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                  <Check className="h-10 w-10 text-green-600" />
+                </div>
+                <p className="text-xl font-bold text-green-600">Updated!</p>
+              </motion.div>
+            )}
+
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

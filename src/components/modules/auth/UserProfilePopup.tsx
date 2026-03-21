@@ -27,7 +27,7 @@ const UserProfile = ({user}:{user:IUser}) => {
                     <div className="mt-2 inline-flex items-center rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
                       {user.user.role}
                     </div>
-                        <UserCreditCard/>
+                     
 
                   </div>
                   <div className="grid gap-1">

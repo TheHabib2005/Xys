@@ -3,12 +3,13 @@
 import AppLoader from "@/components/global/AppLoader";
 import { IUser } from "@/interfaces/user";
 import { getMe } from "@/services/auth.services";
-import { createContext, useContext, useEffect, useState, useCallback } from "react";
+import { createContext, useContext, useEffect, useState, useCallback, SetStateAction, Dispatch } from "react";
 
 interface IUserContext {
   user: IUser | null;
   isLoading: boolean;
   fetchUser: () => Promise<void>;
+  setUser:  Dispatch<SetStateAction<IUser | null>>
 }
 
 export const UserContext = createContext<IUserContext | undefined>(undefined);
@@ -44,7 +45,8 @@ export default function UserContextWrapper({ children }: { children: React.React
   const contextValue: IUserContext = {
     user,
     isLoading,
-    fetchUser
+    fetchUser,
+    setUser
   };
 
   return <UserContext.Provider value={contextValue}>{children}</UserContext.Provider>;

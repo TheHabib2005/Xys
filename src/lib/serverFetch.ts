@@ -26,7 +26,7 @@ async function refreshAccessToken(cookiesStore: string): Promise<string | null> 
 }
 
 
-export async function serverFetch(path: string, options: RequestInit = {}) {
+export async function serverFetch(path: string, options: RequestInit = {},revalidate: number | false = 3600) {
     const cookieStore = await cookies()
 
     let res = await fetch(`${envVeriables.API_URL}${path}`, {
@@ -36,7 +36,11 @@ export async function serverFetch(path: string, options: RequestInit = {}) {
             cookie: cookieStore.toString()
         },
         credentials: "include",
-        cache:"force-cache"
+        cache:"no-cache",
+       next: { 
+            revalidate: revalidate,
+            tags: [path] // Useful for on-demand revalidation later
+        }
     })
 
 

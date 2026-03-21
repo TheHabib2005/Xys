@@ -12,6 +12,9 @@ import { toast } from "sonner";
 import { useUser } from "@/context/UserContext";
 import ClaimFreeCredits from "./ClamFreeCredit";
 import { AvatarUpload } from "./ProfileAvatar";
+import httpClient from "@/lib/axios-client";
+import { log } from "handlebars/runtime";
+import { useApiMutation } from "@/hooks/useApiMutation";
 
 // ----------------------------------------------------------------------
 // AvatarUpload Component
@@ -28,8 +31,8 @@ interface AvatarUploadProps {
 // Main AccountPage Component
 // ----------------------------------------------------------------------
 export default function AccountPage() {
-  const { user, isLoading } = useUser();
-  const [saving, setSaving] = useState(false);
+  const { user, isLoading ,fetchUser,setUser} = useUser();
+
 
   // Initial form state from user data
   const initialForm = useMemo(
@@ -43,6 +46,13 @@ export default function AccountPage() {
     }),
     [user]
   );
+
+  const saveChangeMutation = useApiMutation({
+    endpoint:"/auth/update-profile",
+    actionName:"save changes - update profile",
+    actionType:"SERVER_SIDE",
+    method:"PUT"
+  })
 
   const [form, setForm] = useState(initialForm);
 
@@ -60,21 +70,31 @@ export default function AccountPage() {
     .toUpperCase()
     .slice(0, 2) || "U";
 
-  // Handle avatar upload (mock implementation)
-  const handleAvatarUpload = async (file: File) => {
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    // In a real app you would update the user context with the new image URL
-    toast.success("Profile picture updated");
-  };
 
   // Handle save changes
   const handleSave = async () => {
-    setSaving(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setSaving(false);
+    
+   
+   const {email,...refindPayload} =  form;
+ 
+    
+   const result = await saveChangeMutation.mutateAsync(refindPayload);
+   console.log(result);
+   
+   if(result?.success){
+    setUser(result.data)
+    // setForm({
+    //    name:   result.user?.name || user?.name,
+    //   email:   result.user?.email || user?.email,
+    //   profession:   result.user?.profession ||user?.profession,
+    //   experienceLevel:   result.user?.experienceLevel || user?.experienceLevel,
+    //   location:   result.user?.location || user?.location,
+    //   contactNumber:   result.user?.contactNumber || user?.contactNumber,
+    // })
+
     toast.success("Profile updated successfully!");
+   }
+    
     // In a real app you would update the context with new values
   };
 
@@ -126,15 +146,16 @@ export default function AccountPage() {
       </motion.div>
 
    <AvatarUpload
-  imageUrl={user?.profileAvatar}
+   refetch={fetchUser}
+  imageUrl={user?.profileAvatar || initials}
   initials={user?.name?.charAt(0) || "U"}
-  onUpload={async (file) => {
+  
+  onUpload={async (uploadedUrl) => {
     // Replace with actual API call
-    const formData = new FormData();
-    formData.append("avatar", file);
-    const response = await fetch("/api/user/avatar", { method: "POST", body: formData });
-    const data = await response.json();
-    return data.avatarUrl;
+     const response = await httpClient.put("/auth/change-avatar", {"profileAvatar":uploadedUrl});
+    return response.data
+   
+  
   }}
 />
 
@@ -160,6 +181,7 @@ export default function AccountPage() {
                 <label className="text-sm font-medium">Email</label>
                 <Input
                   value={form.email}
+                  disabled
                   onChange={(e) => setForm({ ...form, email: e.target.value })}
                   className="h-11 bg-card border-border focus-visible:ring-1"
                   placeholder="Enter your email"
@@ -207,10 +229,10 @@ export default function AccountPage() {
             <div className="flex justify-end">
               <Button
                 onClick={handleSave}
-                disabled={saving || !isDirty}
+                disabled={saveChangeMutation.isPending || !isDirty}
                 className="min-w-[140px]"
               >
-                {saving ? (
+                {saveChangeMutation.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Saving...
