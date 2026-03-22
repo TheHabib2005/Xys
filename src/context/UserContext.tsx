@@ -22,11 +22,13 @@ export default function UserContextWrapper({ children }: { children: React.React
     try {
       setIsLoading(true);
       const res = await getMe();
+      console.log(res);
+      
       const userData = res?.data || null;
       setUser(userData);
       console.log(userData);
     } catch (err) {
-      console.error(err);
+      console.log(err);
       setUser(null);
     } finally {
       setIsLoading(false);
@@ -34,6 +36,8 @@ export default function UserContextWrapper({ children }: { children: React.React
   }, []);
 
   useEffect(() => {
+    console.log("calling");
+    
     fetchUser();
   }, [fetchUser]);
 

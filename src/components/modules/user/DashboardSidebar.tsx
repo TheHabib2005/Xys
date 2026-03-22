@@ -1,17 +1,20 @@
 "use client";
 
+import React, { useMemo } from "react";
 import { 
   LayoutDashboard, 
   User, 
   Settings, 
   CreditCard, 
   History, 
-  LogOut, 
   FilePlus, 
-  LucideBookTemplate
+  LucideBookTemplate,
+  ChevronRight,
+  ShieldCheck,
+  HelpCircle
 } from "lucide-react";
 
-import { NavLink } from "@/components/global/NavLink"; // Using the converted Next.js NavLink
+import { NavLink } from "@/components/global/NavLink";
 import {
   Sidebar,
   SidebarContent,
@@ -21,90 +24,168 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarFooter,
+  SidebarHeader,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
-import { useRouter } from "next/navigation";
 import UserCreditCard from "./UserCreditCard";
+import LogoutButton from "../auth/LogoutButton";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { UserRole } from "@/interfaces/enums";
 
-const navItems = [
-  { path: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
-  { path: "/dashboard/profile", label: "Profile", icon: User },
-  { path: "/dashboard/templates", label: "Explor Templates", icon: LucideBookTemplate },
-  { path: "/dashboard/resumes", label: "My Resumes", icon: FilePlus },
-  { path: "/dashboard/history", label: "Analysis History", icon: History },
-  { path: "/profile/plans", label: "Plans", icon: CreditCard },
-  { path: "/profile/settings", label: "Settings", icon: Settings },
-];
+// Navigation Configuration
+const NAVIGATION_CONFIG = {
+  USER: [
+    { path: "/dashboard", label: "Overview", icon: LayoutDashboard, exact: true },
+    { path: "/dashboard/resumes", label: "My Resumes", icon: FilePlus },
+    { path: "/dashboard/templates", label: "Templates", icon: LucideBookTemplate },
+    { path: "/dashboard/history", label: "Analysis History", icon: History },
+  ],
+  ADMIN: [
+    { path: "/admin/dashboard", label: "Admin Overview", icon: LayoutDashboard, exact: true },
+    { path: "/admin/dashboard/templates", label: "Manage Templates", icon: LucideBookTemplate },
+    { path: "/admin/dashboard/transactions", label: "Transactions", icon: History },
+  ],
+  SETTINGS: [
+    { path: "/dashboard/profile", label: "Profile", icon: User },
+    { path: "/profile/plans", label: "Billing", icon: CreditCard },
+    { path: "/profile/settings", label: "Settings", icon: Settings },
+  ]
+};
 
 export default function DashboardSidebar() {
-  const router = useRouter();
-  // const { logout } = useUser();
   const { state } = useSidebar();
+  const { user } = useUser(); // Assuming your context returns a user object with a role
   
   const isCollapsed = state === "collapsed";
+  const isAdmin = user?.user.role === UserRole.ADMIN
+console.log(isAdmin);
 
-  const handleLogout = async () => {
-    try {
-      // await logout();
-      router.push("/");
-    } catch (error) {
-      console.error("Logout failed:", error);
-    }
-  };
+  // Determine which main nav items to show
+  const mainNavItems = isAdmin ? NAVIGATION_CONFIG.ADMIN : NAVIGATION_CONFIG.USER;
 
   return (
-    <Sidebar collapsible="offcanvas" className="border-r border-sidebar-border bg-sidebar">
-      <SidebarContent className="flex flex-col justify-between h-full py-4 pt-16">
-        
-        {/* Main Navigation Group */}
-        <SidebarGroup>
-          <SidebarGroupLabel className="px-4 text-[10px] uppercase font-bold tracking-widest text-sidebar-foreground/40">
-            { "Main Menu"}
-          </SidebarGroupLabel>
+    <Sidebar collapsible="offcanvas" className="border-r border-border/50 bg-card/50 backdrop-blur-xl">
+      {/* Header / Logo Area */}
+      <SidebarHeader className="h-16 flex items-center px-6 border-b border-border/40">
+        <div className="flex items-center gap-3">
+          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+            <ShieldCheck className="text-primary-foreground h-5 w-5" />
+          </div>
+          {!isCollapsed && (
+            <span className="font-bold text-lg tracking-tight bg-gradient-to-br from-foreground to-foreground/60 bg-clip-text text-transparent">
+              ResuBuilt
+            </span>
+          )}
+        </div>
+      </SidebarHeader>
 
-          <UserCreditCard/>
-    
-          <SidebarGroupContent className="mt-2">
-            <SidebarMenu className="gap-1 px-2">
-              {navItems.map((item) => (
-                <SidebarMenuItem key={item.path}>
-                  <SidebarMenuButton asChild tooltip={item.label}>
-                    <NavLink
-                      href={item.path}
-                      exact={item.exact}
-                      className="flex items-center gap-3 rounded-[var(--radius)] px-3 py-2 text-sm font-medium text-sidebar-foreground/70 transition-all hover:bg-sidebar-accent hover:text-sidebar-foreground"
-                      activeClassName="bg-primary/10 text-primary font-semibold shadow-sm shadow-primary/5"
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      {!isCollapsed && <span>{item.label}</span>}
-                    </NavLink>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+      <SidebarContent className="px-3 pt-4 gap-6">
+        {/* Role Indicator (Modern Badge) */}
+        {!isCollapsed && isAdmin && (
+          <div className="mx-2 px-3 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-[10px] font-bold text-amber-600 uppercase tracking-widest w-fit">
+            Admin Access
+          </div>
+        )}
+
+        {/* Main Navigation */}
+        <SidebarGroup>
+          <SidebarGroupLabel className="px-3 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">
+            Platform
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {mainNavItems.map((item) => (
+                <SidebarItem key={item.path} item={item} isCollapsed={isCollapsed} />
               ))}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {/* System Group (Bottom) */}
+        {/* Support/Settings Group */}
         <SidebarGroup>
-          <SidebarGroupContent className="px-2">
-            <SidebarMenu>
+          <SidebarGroupLabel className="px-3 text-xs font-semibold text-muted-foreground/70 uppercase tracking-wider mb-2">
+            Account & System
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-1">
+              {NAVIGATION_CONFIG.SETTINGS.map((item) => (
+                <SidebarItem key={item.path} item={item} isCollapsed={isCollapsed} />
+              ))}
               <SidebarMenuItem>
-                <SidebarMenuButton
-                  onClick={handleLogout}
-                  className="flex items-center gap-3 rounded-[var(--radius)] px-3 py-2 text-sm font-medium text-sidebar-foreground/70 hover:bg-destructive/10 hover:text-destructive transition-all w-full"
-                  tooltip="Sign Out"
-                >
-                  <LogOut className="h-4 w-4 shrink-0" />
-                  {!isCollapsed && <span>Sign Out</span>}
-                </SidebarMenuButton>
+                 <SidebarMenuButton asChild tooltip="Help Center">
+                    <a href="#" className="flex items-center gap-3 px-3 py-2 text-sm text-muted-foreground hover:text-foreground">
+                       <HelpCircle className="h-4 w-4" />
+                       {!isCollapsed && <span>Help Center</span>}
+                    </a>
+                 </SidebarMenuButton>
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
 
+        {/* Credit Card Widget - Integrated nicely */}
+        {!isCollapsed  && !isAdmin && (
+          <div className="px-2 mt-auto mb-4">
+            <UserCreditCard />
+          </div>
+        )}
       </SidebarContent>
+
+      {/* Modern Footer Section */}
+      <SidebarFooter className="border-t border-border/40 p-4 bg-muted/30">
+        <div className={`flex items-center ${isCollapsed ? 'justify-center' : 'justify-between'} gap-2`}>
+          <div className="flex items-center gap-3 overflow-hidden">
+            <Avatar className="h-9 w-9 border-2 border-background shadow-sm">
+              <AvatarImage src={user?.image} />
+              <AvatarFallback className="bg-primary/10 text-primary text-xs font-bold">
+                {user?.name?.charAt(0) || "U"}
+              </AvatarFallback>
+            </Avatar>
+            {!isCollapsed && (
+              <div className="flex flex-col truncate">
+                <span className="text-sm font-semibold truncate leading-none mb-1">
+                  {user?.name || "Guest User"}
+                </span>
+                <span className="text-[11px] text-muted-foreground truncate italic">
+                  {user?.email || "Connect account"}
+                </span>
+              </div>
+            )}
+          </div>
+          
+          {!isCollapsed && (
+            <div className="flex items-center">
+               <LogoutButton />
+            </div>
+          )}
+        </div>
+      </SidebarFooter>
     </Sidebar>
+  );
+}
+
+/**
+ * Reusable Sidebar Item Component
+ */
+function SidebarItem({ item, isCollapsed }: { item: any, isCollapsed: boolean }) {
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild tooltip={item.label} className="group h-10">
+        <NavLink
+          href={item.path}
+          exact={item.exact}
+          className="flex items-center w-full gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all relative overflow-hidden text-muted-foreground hover:text-foreground hover:bg-accent/50"
+          activeClassName="bg-primary/10 text-primary font-bold shadow-[inset_0px_0px_12px_rgba(var(--primary),0.05)] after:absolute after:left-0 after:top-1/4 after:h-1/2 after:w-[3px] after:bg-primary after:rounded-r-full"
+        >
+          <item.icon className={`h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110`} />
+          {!isCollapsed && <span className="flex-1">{item.label}</span>}
+          {!isCollapsed && item.exact && (
+             <div className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
+          )}
+        </NavLink>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
   );
 }

@@ -1,14 +1,16 @@
 import DashboardHeader from '@/components/modules/user/DashboardHeader'
 import DashboardSidebar from '@/components/modules/user/DashboardSidebar'
 import { SidebarProvider } from '@/components/ui/sidebar'
+import UserContextWrapper from '@/context/UserContext'
 
 import { getUserCredit } from '@/services/credit.services'
 import React, { ReactNode } from 'react'
-const layout = async({children}:{children:ReactNode}) => {
+const AdminDashboardLayout = async({children}:{children:ReactNode}) => {
 
     
   return (
-    <div className='min-h-screen  w-full bg-background'>
+   <UserContextWrapper>
+     <div className='min-h-screen  w-full bg-background'>
           <DashboardHeader />
 
   
@@ -26,7 +28,8 @@ const layout = async({children}:{children:ReactNode}) => {
     
   
     </div>
+   </UserContextWrapper>
   )
 }
 
-export default layout
+export default AdminDashboardLayout

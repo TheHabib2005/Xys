@@ -113,15 +113,7 @@ export default function DashboardHeader() {
         {/* 🔷 RIGHT: Actions */}
         <div className="flex items-center gap-2">
 
-          {/* CTA */}
-          <Button
-            size="sm"
-            onClick={() => router.push("/upload")}
-            className="hidden sm:flex items-center gap-2 shadow-lg shadow-primary/20"
-          >
-            <Upload className="h-4 w-4" />
-            New Analysis
-          </Button>
+        
 
           {/* Theme Toggle */}
           {mounted && (

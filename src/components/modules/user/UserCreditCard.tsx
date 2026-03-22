@@ -25,7 +25,7 @@ const UserCreditCard = () => {
     )
   }
 
-  const balance = data?.data.balance ?? 0
+  const balance = data?.data?.balance || 0
 
   return (
     <motion.div 
