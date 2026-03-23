@@ -16,6 +16,7 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import UserProfile from "../auth/UserProfilePopup";
+import Logo from "@/components/global/Logo";
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -59,23 +60,9 @@ export default function DashboardHeader() {
           <SidebarTrigger className="h-9 w-9 rounded-xl border bg-background/50 hover:bg-accent transition" />
 
           {/* Logo */}
-          <div className="flex items-center gap-2 cursor-pointer"
-            onClick={() => router.push("/")}
-          >
-            <div className="p-2 rounded-xl bg-gradient-to-br from-primary/20 to-primary/5">
-              <Bolt className="h-5 w-5 text-primary" />
-            </div>
 
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="font-bold text-lg tracking-tight bg-gradient-to-r from-foreground to-muted-foreground bg-clip-text text-transparent">
-                Blitz Analyzer
-              </span>
-
-              <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
-                PRO
-              </span>
-            </div>
-          </div>
+          <Logo/>
+        
         </div>
 
         {/* 🔶 CENTER: Navigation */}

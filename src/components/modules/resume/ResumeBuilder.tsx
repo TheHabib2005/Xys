@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import {
   useForm,
   FormProvider,
@@ -39,6 +39,7 @@ import { SectionRenderer } from "./builder/ResumeBuilderField";
 import { ResumePreview } from "./ResumePreview";
 import httpClient from "@/lib/axios-client";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { updateResumeName } from "@/services/resume.services";
 
 
 export default function PremiumResumeBuilder({
@@ -50,6 +51,9 @@ export default function PremiumResumeBuilder({
 }) {
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement | null>(null);
+const searchParams = useSearchParams();
+  const page_mode = searchParams.get('mode')// e.g., if URL is /page?name=test
+    const isEditMode = page_mode === "edit";
 
   const [currentStep, setCurrentStep] = useState(0);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
@@ -73,6 +77,24 @@ export default function PremiumResumeBuilder({
   );
 
   const template: any = apiResponse?.data;
+  console.log(template);
+
+  const findCurrentResume = (template) =>{
+    console.log(template);
+    
+  //  if(isEditMode){
+     const crr = template.resume?.map((res) => {
+      if(res.id === builderId){
+        return res.resumeData
+      }
+    })
+    return crr[0]
+  //  }
+  }
+  
+
+
+  
 
   const sections: DynamicSection[] = useMemo(
     () => [...(template?.sections || [])].sort((a, b) => a.order - b.order),
@@ -92,8 +114,12 @@ export default function PremiumResumeBuilder({
 
   useEffect(() => {
     if (!template) return;
+   const crr = template && template?.resume?.filter((res) => {
+     return res.id === builderId
+    })
 
-    const normalized = normalizeResumeData(sections, template.resumeData || {});
+
+    const normalized = normalizeResumeData(sections, crr[0].resumeData || {});
     reset(normalized);
     setLastSaved(new Date());
     setCurrentStep(0);
@@ -104,36 +130,36 @@ export default function PremiumResumeBuilder({
   const autoSaveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const performAutoSave = useCallback(async (data: any) => {
-    setIsAutoSaving(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setLastSaved(new Date());
-    setIsAutoSaving(false);
-    toast.success("Progress auto-saved", { id: "auto-save" });
+    // setIsAutoSaving(true);
+    // await new Promise((resolve) => setTimeout(resolve, 2000));
+    // setLastSaved(new Date());
+    // setIsAutoSaving(false);
+    // toast.success("Progress auto-saved", { id: "auto-save" });
   }, []);
 
-  useEffect(() => {
-    if (!prevDataRef.current) {
-      prevDataRef.current = formData;
-      return;
-    }
+  // useEffect(() => {
+  //   if (!prevDataRef.current) {
+  //     prevDataRef.current = formData;
+  //     return;
+  //   }
 
-    if (!deepEqual(prevDataRef.current, formData)) {
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current);
-      }
+  //   if (!deepEqual(prevDataRef.current, formData)) {
+  //     if (autoSaveTimeoutRef.current) {
+  //       clearTimeout(autoSaveTimeoutRef.current);
+  //     }
 
-      autoSaveTimeoutRef.current = setTimeout(() => {
-        performAutoSave(formData);
-        prevDataRef.current = formData;
-      }, 2000);
-    }
+  //     autoSaveTimeoutRef.current = setTimeout(() => {
+  //       performAutoSave(formData);
+  //       prevDataRef.current = formData;
+  //     }, 2000);
+  //   }
 
-    return () => {
-      if (autoSaveTimeoutRef.current) {
-        clearTimeout(autoSaveTimeoutRef.current);
-      }
-    };
-  }, [formData, performAutoSave]);
+  //   return () => {
+  //     if (autoSaveTimeoutRef.current) {
+  //       clearTimeout(autoSaveTimeoutRef.current);
+  //     }
+  //   };
+  // }, [formData, performAutoSave]);
 
   const progressPercent = useMemo(() => {
     if (!sections.length) return 0;
@@ -180,16 +206,19 @@ export default function PremiumResumeBuilder({
       validateAllSections();
       setShowMobilePreview(false);
     }
-
   }, [reviewMode]);
 
   const onSubmit = async (data: any) => {
-    setIsGenerating(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    toast.success("Resume saved successfully!");
+      setIsGenerating(true);
+       const result =  await updateResumeName(builderId,{resumeData:data,templateId:id} );
+  if(result.success){
+ toast.success("Resume saved successfully!");
     setLastSaved(new Date());
     setIsGenerating(false);
+  }
+   
   };
+  
 
   const handleGenerateResume = async () => {
     if (!template?.htmlLayout) return;
@@ -198,13 +227,14 @@ export default function PremiumResumeBuilder({
     try {
       
       const result = await (await httpClient.post(`/resume/${builderId}/generate-download`)).data
+console.log(result);
 
       if(result.success){
         console.log(result.data);
      
         setShowSuccessModal(true);
 
-        handleClickDownload(result.data.secure_url)
+        handleClickDownload(result.data.resumeUrl)
 
         toast.success("Your Resume is Downloaded");
       }
@@ -270,6 +300,8 @@ export default function PremiumResumeBuilder({
         ref={headerRef}
         className="h-16 border-b px-4 sm:px-6 flex items-center justify-between bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl z-50"
       >
+        
+     
         <div className="flex items-center gap-3">
           <Button
             type="button"
@@ -297,7 +329,7 @@ export default function PremiumResumeBuilder({
             {showMobilePreview ? "Hide" : "Preview"}
           </Button>
 
-          <div className="flex items-center gap-2 text-xs text-zinc-500">
+          {/* <div className="flex items-center gap-2 text-xs text-zinc-500">
             {isAutoSaving ? (
               <>
                 <Loader2 className="h-3 w-3 animate-spin" />
@@ -313,7 +345,21 @@ export default function PremiumResumeBuilder({
             ) : (
               <CloudOff className="h-3 w-3" />
             )}
-          </div>
+          </div> */}
+
+        {page_mode === "edit" &&   <Button
+                    type="submit"
+                    onClick={() =>onSubmit(formData)}
+                    disabled={isGenerating}
+                    className="bg-blue-600 text-white hover:bg-blue-700 rounded-xl px-4 sm:px-5 font-medium"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      <Save className="h-4 w-4 mr-2" />
+                    )}
+                    Save Changes
+                  </Button>}
 
           <Button
             type="button"

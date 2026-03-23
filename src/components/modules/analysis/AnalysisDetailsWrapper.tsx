@@ -6,6 +6,7 @@ import AnalysisDetails from "./ATSAnalysisDetails";
 import JobMatcherDetails from "./JobMatcherAnalysisDetails";
 import { AnalysisSkeleton } from "./AnalysisDetailsSkelections";
 import { AnalysisError, AnalysisNotFound } from "./AnalysisNotFound";
+import { useQuery } from "@tanstack/react-query";
 
 interface Props {
   id: string;
@@ -13,34 +14,43 @@ interface Props {
 
 const AnalysisDetailsWrapper = ({ id }: Props) => {
   const [loading, setLoading] = useState<boolean>(true);
-  const [data, setData] = useState<any>(null);
+  // const [data, setData] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+ const cacheKey = `fetch-analysis-details-${id}`
+  // const fetchAnalysis = async () => {
+  //   try {
+  //     setLoading(true);
+  //     setError(null);
 
-  const fetchAnalysis = async () => {
-    try {
-      setLoading(true);
-      setError(null);
+  //     const response = await httpClient.post(`/analyzer/analysis/${id}`, null, {
+  //       headers: {
+  //         "Content-Type": "multipart/form-data",
+  //       },
+  //     });
 
-      const response = await httpClient.post(`/analyzer/analysis/${id}`, null, {
-        headers: {
+  //     setData(response?.data?.data || null);
+  //   } catch (err) {
+  //     console.error(err);
+  //     setError("Something went wrong while loading analysis.");
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
+  const {data,isLoading,refetch} = useQuery({queryKey:[cacheKey],queryFn:async () => httpClient.post(`/analyzer/analysis/${id}`,{},{
+      headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+  })})
 
-      setData(response?.data?.data || null);
-    } catch (err) {
-      console.error(err);
-      setError("Something went wrong while loading analysis.");
-    } finally {
-      setLoading(false);
-    }
-  };
+  // useEffect(() => {
+  //   if (id) fetchAnalysis();
+  // }, [id]);
 
-  useEffect(() => {
-    if (id) fetchAnalysis();
-  }, [id]);
+  console.log(data);
+  
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-[60vh] flex items-center justify-center">
         <AnalysisSkeleton />
@@ -58,11 +68,8 @@ const AnalysisDetailsWrapper = ({ id }: Props) => {
 
   return (
     <div className="space-y-6">
-      {data.analysis_type === "ATS_SCAN" ? (
-        <AnalysisDetails data={data} />
-      ) : (
-        <JobMatcherDetails data={data} />
-      )}
+   
+        <AnalysisDetails  analysisData={data?.data?.data} onRetry={refetch}/>
     </div>
   );
 };

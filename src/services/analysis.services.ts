@@ -20,3 +20,4 @@ export const deleteAnalysis = async (analysisId:string) =>{
     }
 
 }
+

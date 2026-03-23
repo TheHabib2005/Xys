@@ -12,7 +12,7 @@ export const ResumePreview = ({
 }) => {
   const [compiledHtml, setCompiledHtml] = useState("");
   const iframeRef = useRef<HTMLIFrameElement>(null);
-console.log(data);
+
 
   useEffect(() => {
     if (!template?.htmlLayout) return;

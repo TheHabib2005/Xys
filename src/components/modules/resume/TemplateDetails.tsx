@@ -77,8 +77,7 @@ return
     templateId:id
  })
  
-
-window.location.href = `/dashboard/templates/${id}/builder/${result.data.id}`
+router.push(`/dashboard/templates/${id}/builder/${result.data.id}`)
   
   };
 

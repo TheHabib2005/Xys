@@ -1,6 +1,8 @@
 "use client"
 import { Zap } from "lucide-react";
+import { useTheme } from "next-themes";
 import { useRouter } from "next/navigation";
+import { useMemo } from "react";
 
 interface LogoProps {
   size?: "sm" | "md" | "lg";
@@ -16,15 +18,19 @@ export default function Logo({ size = "md", clickable = true }: LogoProps) {
   };
   const s = sizes[size];
 
+  const {theme} =  useTheme();
+
+  const logoUrl = useMemo(()=>{
+     return `/logos/${theme}-logo.svg`;
+  },[theme])
+
   return (
     <div
       className={`flex items-center gap-2.5 ${clickable ? "cursor-pointer" : ""}`}
       onClick={clickable ? () => navigate.push("/") : undefined}
     >
-      <div className={`flex ${s.box} items-center justify-center rounded-lg bg-gradient-primary shadow-glow`}>
-        <Zap className={`${s.icon} text-primary-foreground`} />
-      </div>
-      <span className={`font-display ${s.text} font-bold text-gradient-primary hidden sm:block`}>Blitz AI</span>
+      
+     <img src={logoUrl} alt="" className="w-[180px]" />
     </div>
   );
 }

@@ -31,7 +31,7 @@ const ResumeListItem = ({resume,cacheKey}:{resume:ResumeItem,cacheKey:string}) =
 
       const { mutateAsync: updateName, isPending: isUpdating } = useMutation({
         mutationFn: ({ resumeId, name,templateId }: { resumeId: string; name: string; templateId: string }) => 
-          updateResumeName({resumeId:resumeId,body:{name:name,templateId}}),
+          updateResumeName(resumeId,{name:name,templateId}),
        
       });
     
@@ -42,7 +42,7 @@ const ResumeListItem = ({resume,cacheKey}:{resume:ResumeItem,cacheKey:string}) =
 
         // Handlers
   const handleEditFull = (templateId: string,resumeId:string) => {
-    router.push(`/dashboard/templates/${templateId}/builder/${resumeId}`);
+    router.push(`/dashboard/templates/${templateId}/builder/${resumeId}?mode=edit`);
   };
 
 

@@ -14,11 +14,11 @@ export const getAllResumeById = async () =>{
     }
     return null
 }
-export const updateResumeName  = async (data:{
+export const updateResumeName  = async (
     resumeId:string,
-    body:{name:string;templateId:string}
-}) =>{
-    const result = await httpClient.post(`/resume/${data.resumeId}/update-resume`,data.body, {
+    body:any
+) =>{
+    const result = await httpClient.post(`/resume/${resumeId}/update-resume`,body, {
         headers:{
             "cookie":(await getAllCookies()).toString()
         }
