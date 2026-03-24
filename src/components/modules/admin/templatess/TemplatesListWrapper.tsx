@@ -24,6 +24,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import Link from "next/link"
+import { useApiMutation } from "@/hooks/useApiMutation"
+import { useQueryClient } from "@tanstack/react-query"
 
 const categories = ["all", "professional", "creative", "simple", "modern"] as const
 
@@ -63,7 +66,7 @@ export default function TemplatesAdminList() {
   return (
     <div className="min-h-screen bg-[#f9fafb] dark:bg-background pb-20">
       {/* Top Header Section */}
-      <div className="bg-white dark:bg-card border-b">
+      <div className=" container mx-auto  border-b">
         <div className="container mx-auto px-6 py-8">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -72,8 +75,10 @@ export default function TemplatesAdminList() {
                 Manage, edit, and monitor your resume template marketplace.
               </p>
             </div>
-            <Button className="shrink-0 gap-2 shadow-sm">
+            <Button >
+             <Link className="shrink-0 gap-2 shadow-sm flex" href={"/admin/dashboard/templates/create-template"}>
               <Plus className="h-4 w-4" /> Create Template
+             </Link>
             </Button>
           </div>
         </div>
@@ -159,70 +164,7 @@ export default function TemplatesAdminList() {
                 ))
               ) : filtered.length > 0 ? (
                 filtered.map((t) => (
-                  <tr
-                    key={t.id}
-                    className="group hover:bg-muted/20 transition-colors"
-                  >
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-4">
-                        <div className="h-12 w-9 rounded border bg-muted/30 flex items-center justify-center text-muted-foreground group-hover:border-primary/30 transition-colors">
-                          <FileText className="h-5 w-5" />
-                        </div>
-                        <div>
-                          <p className="font-medium text-foreground">{t.name}</p>
-                          <p className="text-xs text-muted-foreground">ID: {t.id.slice(0, 8)}...</p>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      <Badge variant="outline" className="font-normal capitalize bg-background">
-                        {t.slug.split('-')[0] || "General"}
-                      </Badge>
-                    </td>
-                    <td className="px-6 py-4 hidden md:table-cell">
-                      <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
-                        <Layers className="h-4 w-4" />
-                        <span>{t.sections.length} Sections</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      {t.isPremium ? (
-                        <Badge className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 gap-1 px-2 py-0.5">
-                          <Crown className="h-3 w-3 fill-amber-500" /> Premium
-                        </Badge>
-                      ) : (
-                        <Badge variant="secondary" className="font-normal px-2 py-0.5">Free</Badge>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex justify-end gap-2">
-                         <Button size="icon" variant="ghost" className="h-8 w-8 text-muted-foreground">
-                            <ExternalLink className="h-4 w-4" />
-                         </Button>
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button size="icon" variant="ghost" className="h-8 w-8">
-                              <MoreHorizontal className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem onClick={() => alert(`Edit ${t.name}`)}>
-                              <Settings2 className="mr-2 h-4 w-4" /> Edit Template
-                            </DropdownMenuItem>
-                            <DropdownMenuItem>
-                              <FileText className="mr-2 h-4 w-4" /> Duplicate
-                            </DropdownMenuItem>
-                            <DropdownMenuSeparator />
-                            <DropdownMenuItem className="text-destructive focus:bg-destructive/10 focus:text-destructive">
-                              Delete Template
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
-                    </td>
-                  </tr>
+                 <TemplateCard key={t.id} t={t}/>
                 ))
               ) : (
                 <tr>
@@ -259,4 +201,76 @@ export default function TemplatesAdminList() {
       </div>
     </div>
   )
+}
+
+const TemplateCard =  ({t}) =>{
+
+  const queryClient = useQueryClient()
+  const deleteMutation =  useApiMutation({
+    endpoint:`/template/${t.id}`,
+    actionName:"delete template",
+    actionType:"SERVER_SIDE",
+    method:"DELETE"
+   
+  })
+
+  const handleDelete = async () =>{
+    const result = await await deleteMutation.mutateAsync({});
+    console.log(result);
+    
+    if(result.success){
+     queryClient.invalidateQueries({queryKey:["templates-list"]})
+    };
+  }
+
+  return   <tr
+                    key={t.id}
+                    className="group hover:bg-muted/20 transition-colors"
+                  >
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-4">
+                        <div className="h-12 w-9 rounded border bg-muted/30 flex items-center justify-center text-muted-foreground group-hover:border-primary/30 transition-colors">
+                          <FileText className="h-5 w-5" />
+                        </div>
+                        <div>
+                          <p className="font-medium text-foreground">{t.name}</p>
+                          <p className="text-xs text-muted-foreground">ID: {t.id.slice(0, 8)}...</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell">
+                      <Badge variant="outline" className="font-normal capitalize bg-background">
+                        {t.slug.split('-')[0] || "General"}
+                      </Badge>
+                    </td>
+                    <td className="px-6 py-4 hidden md:table-cell">
+                      <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
+                        <Layers className="h-4 w-4" />
+                        <span>{t.sections.length} Sections</span>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      {t.isPremium ? (
+                        <Badge className="bg-amber-50 text-amber-700 border-amber-200 hover:bg-amber-50 dark:bg-amber-900/20 dark:text-amber-400 gap-1 px-2 py-0.5">
+                          <Crown className="h-3 w-3 fill-amber-500" /> Premium
+                        </Badge>
+                      ) : (
+                        <Badge variant="secondary" className="font-normal px-2 py-0.5">Free</Badge>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex justify-end gap-2">
+                         <Button size="icon" variant="link" className=" text-muted-foreground">
+                            <Link href={`/admin/dashboard/templates/${t.id}`} >
+                            <ExternalLink className="h-4 w-4" />
+                            Edit
+                            </Link>
+                         </Button>
+                      <Button 
+                      onClick={handleDelete}
+                      disabled={deleteMutation.isPending}
+                      variant={"destructive"}>{deleteMutation.isPending ? "Deleting" : "Delete"} </Button>
+                      </div>
+                    </td>
+                  </tr>
 }

@@ -17,6 +17,7 @@ import { useUser } from "@/context/UserContext";
 import { cn } from "@/lib/utils";
 import UserProfile from "../auth/UserProfilePopup";
 import Logo from "@/components/global/Logo";
+import Link from "next/link";
 
 export default function DashboardHeader() {
   const router = useRouter();
@@ -123,7 +124,9 @@ export default function DashboardHeader() {
             <UserProfile user={user} />
           ) : (
             <Button variant="outline" size="sm">
+           <Link href={"/sign-in"}>
               Sign In
+           </Link>
             </Button>
           )}
         </div>

@@ -22,18 +22,24 @@ import { Badge } from "./AnalysisNotFound";
 import SaveAnalysisResult from "./SaveAnalysisResult";
 import { useApiMutation } from "@/hooks/useApiMutation";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 interface AnalysisPageProps {
   analysisData: any;
   isLoading?: boolean;
   error?: Error | null;
   onRetry?: () => void;
+  cacheKey:string
 }
 
-export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageProps) {
+export default function AnalysisDetails({ analysisData,onRetry,cacheKey  }: AnalysisPageProps) {
+
+  const analysisResult =  analysisData ? analysisData.result : analysisData;
+console.log(analysisResult);
+
   const [activeTab, setActiveTab] = useState("overview");
-  // console.log(analysisData.reportUrl);
-  console.log(analysisData.data);
+  const [isReportGenerated, setIsReportGenerated] = useState( analysisData.reportUrl || "");
+
   
  const router = useRouter()
   const handleBack = ()=>{
@@ -41,21 +47,31 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
   }
 
   const reportMutation = useApiMutation({
-    endpoint:`/analyzer/analysis/generate-report/${analysisData.id}`,
+    endpoint:`/analyzer/analysis/generate-report/${analysisResult.id}`,
     actionName:"Generate Report",
     actionType:"SERVER_SIDE",
     method:"POST"
   });
+    const queryClient = useQueryClient()
 
   const generateAtsReport = async () =>{
 
-    if(analysisData.reportUrl){
-      toast.success("Report Already Generated")
+
+    if(analysisData.reportUrl || isReportGenerated){
+      toast.success("Report  Generated")
+         const a = document.createElement("a");
+      a.href = analysisResult.reportUrl || isReportGenerated;
+      a.download = `report.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(analysisResult.reportUrl || isReportGenerated);
       return
     }
+     
         const result = await reportMutation.mutateAsync({});
         if(result.success){
-
+      
            const a = document.createElement("a");
       a.href = result.data;
       a.download = `report.pdf`;
@@ -63,6 +79,7 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(result.data);
+       setIsReportGenerated(result.data)
           onRetry()
         }
 
@@ -71,7 +88,7 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
   return (
     <div className="min-h-screen bg-gradient-to-b from-background via-background/95 to-background text-foreground p-4 md:p-8">
       <div className="max-w-6xl mx-auto space-y-8">
-        
+   
         {/* Header Section */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
           <div>
@@ -88,13 +105,16 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
             </h1>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
-            <SaveAnalysisResult id={analysisData.id} />
-            <Button 
+            <SaveAnalysisResult id={analysisResult.id} cacheKey={cacheKey} />
+
+
+        { analysisResult.reportUrl !== null ? <Button 
             disabled={reportMutation.isPending}
-            onClick={()=>generateAtsReport(analysisData.result)}
+            onClick={()=>generateAtsReport(analysisResult)}
             variant="outline" className="rounded-xl border-border/60 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 flex-1 md:flex-none">
              {!reportMutation.isPending ? <> <Download className="mr-2 h-4 w-4" /> Generate Report</> : <> <Loader className="mr-2 h-4 w-4 animate-spin" /> Generating Report</>}
-            </Button>
+            </Button> : null}
+            
           </div>
         </header>
 
@@ -107,15 +127,15 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
             className="lg:col-span-2 relative overflow-hidden rounded-3xl border bg-gradient-to-br from-card via-card/95 to-card p-6 md:p-8 shadow-lg hover:shadow-xl transition-shadow duration-300"
           >
             <div className="relative z-10 flex flex-col md:flex-row items-center gap-6 md:gap-8">
-              <ScoreRing score={analysisData.result.overall_score} />
+              <ScoreRing score={analysisResult.overall_score} />
               <div className="space-y-3 text-center md:text-left">
                 <div className="flex flex-wrap items-center justify-center md:justify-start gap-2">
                   <h3 className="text-2xl font-bold">Overall ATS Score</h3>
-                  <Badge variant={analysisData.result.overall_score > 80 ? 'success' : analysisData.result.overall_score > 60 ? 'warning' : 'error'}>
-                    Level: {analysisData.result.overall_score > 80 ? 'High' : analysisData.result.overall_score > 60 ? 'Medium' : 'Low'}
+                  <Badge variant={analysisResult.overall_score > 80 ? 'success' : analysisResult.overall_score > 60 ? 'warning' : 'error'}>
+                    Level: {analysisResult.overall_score > 80 ? 'High' : analysisResult.overall_score > 60 ? 'Medium' : 'Low'}
                   </Badge>
                 </div>
-                <p className="text-muted-foreground leading-relaxed max-w-md">{analysisData.result.summary}</p>
+                <p className="text-muted-foreground leading-relaxed max-w-md">{analysisResult.summary}</p>
               </div>
             </div>
             <div className="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-primary/10 via-primary/5 to-transparent pointer-events-none" />
@@ -132,7 +152,7 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
                 <ShieldCheck className="h-4 w-4 text-primary" /> Scan Vitals
               </h4>
               <div className="space-y-4">
-                {analysisData.result.vitals?.map((vital: any) => (
+                {analysisResult.vitals?.map((vital: any) => (
                   <div key={vital.id} className="space-y-1.5">
                     <div className="flex justify-between text-xs">
                       <span className="text-muted-foreground uppercase font-semibold">{vital.category}</span>
@@ -183,9 +203,9 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             <div className="lg:col-span-2 space-y-6">
-              {activeTab === 'overview' && <OverviewTab data={analysisData.result} />}
-              {activeTab === 'keywords' && <KeywordsTab data={analysisData.result} />}
-              {activeTab === 'audit' && <AuditTab data={analysisData.result} />}
+              {activeTab === 'overview' && <OverviewTab data={analysisResult} />}
+              {activeTab === 'keywords' && <KeywordsTab data={analysisResult} />}
+              {activeTab === 'audit' && <AuditTab data={analysisResult} />}
             </div>
 
             <div className="space-y-6">
@@ -198,7 +218,7 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
                   <div className="flex justify-between items-end border-b border-border/50 pb-4">
                     <span className="text-sm text-muted-foreground">Readability</span>
                     <div className="text-right">
-                      <div className="text-xl font-bold">{analysisData.result.technical_audit?.readability?.flesch_kincaid_score || 'N/A'}</div>
+                      <div className="text-xl font-bold">{analysisResult.technical_audit?.readability?.flesch_kincaid_score || 'N/A'}</div>
                       <div className="text-[10px] text-muted-foreground font-medium uppercase">Flesch Score</div>
                     </div>
                   </div>
@@ -206,8 +226,8 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
                     <span className="text-sm text-muted-foreground">Achievement Ratio</span>
                     <div className="text-right">
                       <div className="text-xl font-bold">
-                        {analysisData.result.technical_audit?.action_verbs_usage?.achievement_ratio 
-                          ? `${(analysisData.result.technical_audit.action_verbs_usage.achievement_ratio * 100).toFixed(0)}%` 
+                        {analysisResult.technical_audit?.action_verbs_usage?.achievement_ratio 
+                          ? `${(analysisResult.technical_audit.action_verbs_usage.achievement_ratio * 100).toFixed(0)}%` 
                           : 'N/A'}
                       </div>
                       <div className="text-[10px] text-muted-foreground font-medium uppercase">Action Verbs</div>
@@ -217,8 +237,8 @@ export default function AnalysisDetails({ analysisData,onRetry  }: AnalysisPageP
                     <span className="text-sm text-muted-foreground">Skills Match</span>
                     <div className="text-right">
                       <div className="text-xl font-bold text-primary">
-                        {analysisData.result.technical_audit?.skills_relevance?.expected_vs_found 
-                          ? `${(analysisData.result.technical_audit.skills_relevance.expected_vs_found * 100).toFixed(0)}%` 
+                        {analysisResult.technical_audit?.skills_relevance?.expected_vs_found 
+                          ? `${(analysisResult.technical_audit.skills_relevance.expected_vs_found * 100).toFixed(0)}%` 
                           : 'N/A'}
                       </div>
                       <div className="text-[10px] text-muted-foreground font-medium uppercase">Relevance</div>

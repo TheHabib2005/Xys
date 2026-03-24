@@ -73,6 +73,7 @@ const searchParams = useSearchParams();
     "axios",
     {
       refetchOnWindowFocus: false,
+      staleTime:0
     }
   );
 
@@ -118,8 +119,10 @@ const searchParams = useSearchParams();
      return res.id === builderId
     })
 
+    console.log(crr);
+    
 
-    const normalized = normalizeResumeData(sections, crr[0].resumeData || {});
+    const normalized = normalizeResumeData(sections,  crr[0].resumeData || {});
     reset(normalized);
     setLastSaved(new Date());
     setCurrentStep(0);

@@ -69,7 +69,7 @@ const AnalysisDetailsWrapper = ({ id }: Props) => {
   return (
     <div className="space-y-6">
    
-        <AnalysisDetails  analysisData={data?.data?.data} onRetry={refetch}/>
+        <AnalysisDetails cacheKey={cacheKey} analysisData={data?.data?.data} onRetry={refetch}/>
     </div>
   );
 };

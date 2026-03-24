@@ -22,8 +22,8 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ field, path }) => {
 
   return (
     <div className={cn("space-y-1.5", field.ui?.grid)}>
-      <label htmlFor={fieldId} className="text-xs font-semibold uppercase tracking-wider text-slate-500">
-        {field.label} {field.required && <span className="text-red-500">*</span>}
+      <label htmlFor={fieldId} className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {field.label} {field.required && <span className="text-destructive">*</span>}
       </label>
       
       {field.type === 'textarea' ? (
@@ -45,7 +45,7 @@ const DynamicField: React.FC<DynamicFieldProps> = ({ field, path }) => {
       )}
       
       {error && (
-        <p className="text-[11px] font-medium text-red-500">
+        <p className="text-[11px] font-medium text-destructive">
           {error.message}
         </p>
       )}
@@ -62,19 +62,19 @@ const SectionWrapper: React.FC<SectionWrapperProps> = ({ section, children }) =>
   const [isOpen, setIsOpen] = React.useState(true);
 
   return (
-    <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm transition-all hover:shadow-md">
+    <div className="overflow-hidden rounded-xl border border-border bg-card shadow-sm transition-all hover:shadow-md">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex w-full items-center justify-between bg-slate-50/50 px-6 py-4 text-left transition-colors hover:bg-slate-50"
+        className="flex w-full items-center justify-between bg-muted/50 px-6 py-4 text-left transition-colors hover:bg-muted"
       >
         <div>
-          <h3 className="text-lg font-bold text-slate-900">{section.label}</h3>
+          <h3 className="text-lg font-bold text-foreground">{section.label}</h3>
           {section.ui?.description && (
-            <p className="text-xs text-slate-500">{section.ui.description}</p>
+            <p className="text-xs text-muted-foreground">{section.ui.description}</p>
           )}
         </div>
-        {isOpen ? <ChevronDown className="h-5 w-5 text-slate-400" /> : <ChevronUp className="h-5 w-5 text-slate-400" />}
+        {isOpen ? <ChevronDown className="h-5 w-5 text-muted-foreground/60" /> : <ChevronUp className="h-5 w-5 text-muted-foreground/60" />}
       </button>
       
       <AnimatePresence>
@@ -119,10 +119,10 @@ export const ResumeFormSection: React.FC<{ section: Section }> = ({ section }) =
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95 }}
-                className="relative space-y-4 rounded-lg border border-slate-100 bg-slate-50/30 p-4"
+                className="relative space-y-4 rounded-lg border border-border/50 bg-muted/30 p-4"
               >
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <span className="text-xs font-bold uppercase text-slate-400">
+                <div className="flex items-center justify-between border-b border-border/50 pb-2">
+                  <span className="text-xs font-bold uppercase text-muted-foreground/60">
                     {section.label} #{index + 1}
                   </span>
                   <Button
@@ -130,7 +130,7 @@ export const ResumeFormSection: React.FC<{ section: Section }> = ({ section }) =
                     variant="ghost"
                     size="icon"
                     onClick={() => remove(index)}
-                    className="h-8 w-8 text-slate-400 hover:text-red-500"
+                    className="h-8 w-8 text-muted-foreground/60 hover:text-destructive"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -153,7 +153,7 @@ export const ResumeFormSection: React.FC<{ section: Section }> = ({ section }) =
             type="button"
             variant="outline"
             onClick={handleAdd}
-            className="w-full border-dashed border-slate-300 py-6 text-slate-500 hover:border-slate-900 hover:bg-slate-50 hover:text-slate-900"
+            className="w-full border-dashed border-border py-6 text-muted-foreground hover:border-foreground hover:bg-muted hover:text-foreground"
           >
             <Plus className="mr-2 h-4 w-4" />
             Add {section.label}

@@ -3,14 +3,15 @@ import { Button } from '@/components/ui/button'
 import { useUser } from '@/context/UserContext'
 import { useApiMutation } from '@/hooks/useApiMutation'
 import { AnalysisResult } from '@/interfaces/analysis'
+import { useQueryClient } from '@tanstack/react-query'
 import { File, Loader, Store } from 'lucide-react'
 import React from 'react'
 
-const SaveAnalysisResult = ({id}:{id:string}) => {
+const SaveAnalysisResult = ({id,cacheKey}:{id:string,cacheKey:string}) => {
 
     const {user,isLoading} = useUser()
   
-    
+    const queryClient = useQueryClient()
 
     const {isPending,mutateAsync} = useApiMutation({
         actionName:"save-analysis-details",
@@ -22,6 +23,14 @@ const SaveAnalysisResult = ({id}:{id:string}) => {
 
     const handleSaveDetails = async ()=>{
        const result = await mutateAsync({})
+       if(result.success){
+           console.log(result);
+           alert();
+        queryClient.invalidateQueries({queryKey:[cacheKey]})
+
+
+       }
+       
        
     }
 
