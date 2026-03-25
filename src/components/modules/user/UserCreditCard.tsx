@@ -9,7 +9,7 @@ const UserCreditCard = () => {
   const { data, isLoading } = useQuery<{ data: { balance: number } }>({
     queryKey: ["fetch-user-credit"],
     queryFn: getUserCredit,
-    refetchOnWindowFocus: false,
+    refetchOnWindowFocus: true,
   })
 
   // Loading State: A pulse effect that matches the card shape

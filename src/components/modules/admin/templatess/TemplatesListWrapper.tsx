@@ -26,7 +26,8 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Link from "next/link"
 import { useApiMutation } from "@/hooks/useApiMutation"
-import { useQueryClient } from "@tanstack/react-query"
+import { useQuery, useQueryClient } from "@tanstack/react-query"
+import { getAllTemplatePublic } from "@/services/admin.services"
 
 const categories = ["all", "professional", "creative", "simple", "modern"] as const
 
@@ -35,11 +36,11 @@ export default function TemplatesAdminList() {
   const [showPremium, setShowPremium] = useState<"all" | "free" | "premium">("all")
   const [search, setSearch] = useState<string>("")
 
-  const { data, isFetching } = useApiQuery(
-    ["templates-list"],
-    "/template",
-    "axios",
-    { staleTime: 1000 * 60 * 5 }
+  const { data, isFetching } = useQuery(
+    {
+      queryKey:["templates-list"],
+      queryFn:getAllTemplatePublic
+    }
   )
 
   const templates: ResumeTemplate[] | any = data?.data || []

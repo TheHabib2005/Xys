@@ -17,17 +17,12 @@ export function useApiQuery<T>(
     queryFn: async () =>  {
 
   
-      const cookies = await getAllCookies()
+  
 
  try {
         if (fetchMethod === "axios") {
           // Client-side Axios
-
-
           const { data } = await httpClient.get(endpoint,{
-         headers:{
-          "cookie":cookies.toString()
-         }
           });
           console.log(data);
           

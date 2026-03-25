@@ -21,3 +21,13 @@ export const deleteAnalysis = async (analysisId:string) =>{
 
 }
 
+
+
+export const getAnalysisDetails = async (id) =>{
+   const {data}  = await httpClient.post(`/analyzer/analysis/${id}`,{},{
+      headers: {
+          "Content-Type": "multipart/form-data",
+        },
+  });
+  return data
+}

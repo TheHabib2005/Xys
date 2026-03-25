@@ -14,6 +14,8 @@ import { SchemaEditor } from './SchemaEditor';
 import { useTheme } from 'next-themes';
 import { useApiMutation } from '@/hooks/useApiMutation';
 import { useApiQuery } from '@/hooks/useApiQuery';
+import { getAllTemplateDetailsPublic } from '@/services/admin.services';
+import { useQuery } from '@tanstack/react-query';
 
 // Initial data provided by user
 const INITIAL_SCHEMA: Section[] = []
@@ -22,9 +24,12 @@ export default function TemplateEditPage({id}) {
   const [schema, setSchema] = React.useState<Section[]>(INITIAL_SCHEMA);
   const [view, setView] = React.useState<'editor' | 'template' | 'settings'>('editor');
 
-  const {data,isLoading,isError,isFetched} = useApiQuery([""],`/template/templateDetails/${id}`,"axios");
-
-
+  const { data,isLoading,isFetched } = useQuery(
+    {
+      queryKey:[`templates-${id}`],
+      queryFn:()=>getAllTemplateDetailsPublic(id)
+    }
+  )
 
   const [mockData, setMockData] = React.useState<any>(generateMockData(INITIAL_SCHEMA));
   const [template, setTemplate] = React.useState<{ html: string; css: string }>({ 
@@ -33,16 +38,8 @@ export default function TemplateEditPage({id}) {
   });
 
 
-   
-
  const {theme,setTheme} = useTheme()
   const [metadata, setMetadata] = React.useState<TemplateMetadata>({
-    // name: 'Modern Professional',
-    // slug: 'modern-professional',
-    // description: 'A clean, modern template for professionals.',
-    // previewUrl: 'https://picsum.photos/seed/resume/800/1000',
-    // price: 0,
-    // isPremium: false
       name: '',
     slug: '',
     description: '',

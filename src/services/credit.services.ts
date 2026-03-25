@@ -1,11 +1,19 @@
 "use server"
 
+import httpClient from "@/lib/axios-client";
 import { serverFetch } from "@/lib/serverFetch"
 import { revalidateTag } from "next/cache";
 
 export const getUserCredit = async ()=>{
- const res = await serverFetch("/wallet/my-blance");
- return res
+ 
+
+  const res = await httpClient.get("/wallet/my-blance", {
+      headers: {
+        "cookie": cookieStore.toString()
+      }
+    });
+
+    return res.data
 }
 
 

@@ -1,15 +1,17 @@
 'use client'
 
 import { useState, useMemo } from 'react'
-import { useApiQuery } from '@/hooks/useApiQuery'
 import { useApiMutation } from '@/hooks/useApiMutation'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { ArrowUpDown, ChevronDown, Search, Edit, Check, Loader2 } from 'lucide-react'
+import { ArrowUpDown, Search, Edit, Check, Loader2 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
+import { useQuery } from '@tanstack/react-query'
+import { getAllPlans } from '@/services/admin.services'
+import { Skeleton } from '@/components/ui/skeleton' // Ensure you have this shadcn component
 
 export interface Plan {
   id: string
@@ -31,15 +33,15 @@ export default function ManagesPlansWrapper() {
   const [status, setStatus] = useState<'Active' | 'Inactive'>('Active')
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const { data, isFetching, refetch } = useApiQuery<{ data: Plan[] }>(['plans'], '/pricing', 'axios')
-  console.log(data);
-  
+  const { data, isLoading, isFetching, refetch } = useQuery<{ data: Plan[] }>({
+    queryKey: ['plans'],
+    queryFn: getAllPlans
+  })
+
   const plans: Plan[] = data?.data || []
 
-  // Mutation setup - Note: We pass the ID dynamically in mutateAsync if your hook supports it, 
-  // or we ensure editingPlan exists during the call.
   const updatePlanMutation = useApiMutation({
-    endpoint: `/pricing/${editingPlan?.id}`, // This updates when editingPlan changes
+    endpoint: `/pricing/${editingPlan?.id}`,
     actionName: 'update plan',
     actionType: 'SERVER_SIDE',
     method: 'PATCH'
@@ -47,7 +49,6 @@ export default function ManagesPlansWrapper() {
 
   const handleUpdatePlan = async () => {
     if (!editingPlan) return
-    
     const payload = {
       name: editingPlan.name,
       price: editingPlan.price,
@@ -57,12 +58,9 @@ export default function ManagesPlansWrapper() {
 
     try {
       setIsUpdating(true)
-      
-      // Execute mutation while editingPlan is still in state (so ID is valid)
       const result = await updatePlanMutation.mutateAsync(payload)
-      
       if (result.success) {
-        setEditingPlan(null) // Only close on success
+        setEditingPlan(null)
         setShowSuccess(true)
         await refetch()
       }
@@ -73,7 +71,6 @@ export default function ManagesPlansWrapper() {
     }
   }
 
-  // Filter & Sort Logic
   const filteredPlans = useMemo(() => {
     let items = [...plans]
     if (search) {
@@ -98,7 +95,6 @@ export default function ManagesPlansWrapper() {
         </div>
       </div>
 
-      {/* Toolbar */}
       <div className="flex flex-col sm:flex-row gap-4 justify-between mb-6">
         <div className="relative w-full sm:w-80">
           <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
@@ -125,7 +121,6 @@ export default function ManagesPlansWrapper() {
         </DropdownMenu>
       </div>
 
-      {/* Table Content */}
       <div className="rounded-xl border bg-card overflow-hidden">
         <div className="grid grid-cols-12 px-6 py-4 text-[11px] uppercase font-bold bg-muted/50 border-b">
           <div className="col-span-4">Plan Name</div>
@@ -135,26 +130,39 @@ export default function ManagesPlansWrapper() {
           <div className="col-span-2 text-right">Action</div>
         </div>
 
-        {plans.map((plan) => (
-          <div key={plan.id} className="grid grid-cols-12 px-6 py-4 border-b items-center hover:bg-muted/20 transition">
-            <div className="col-span-4 font-medium">{plan.name}</div>
-            <div className="col-span-2">{plan.credits}</div>
-            <div className="col-span-2">{plan.currency} {plan.price}</div>
-            <div className="col-span-2">
-              <Badge variant={plan.isActive ? "default" : "destructive"}>
-                {plan.isActive ? 'Active' : 'Inactive'}
-              </Badge>
+        {/* --- LOADING SKELETON STATE --- */}
+        {isLoading ? (
+          Array.from({ length: 5 }).map((_, i) => (
+            <div key={i} className="grid grid-cols-12 px-6 py-4 border-b items-center">
+              <div className="col-span-4"><Skeleton className="h-4 w-[150px]" /></div>
+              <div className="col-span-2"><Skeleton className="h-4 w-[60px]" /></div>
+              <div className="col-span-2"><Skeleton className="h-4 w-[80px]" /></div>
+              <div className="col-span-2"><Skeleton className="h-6 w-[70px] rounded-full" /></div>
+              <div className="col-span-2 flex justify-end"><Skeleton className="h-8 w-20" /></div>
             </div>
-            <div className="col-span-2 text-right">
-              <Button size="sm" variant="ghost" onClick={() => {
-                setEditingPlan(plan)
-                setStatus(plan.isActive ? 'Active' : 'Inactive')
-              }}>
-                <Edit className="h-4 w-4 mr-1" /> Edit
-              </Button>
+          ))
+        ) : (
+          filteredPlans.map((plan) => (
+            <div key={plan.id} className="grid grid-cols-12 px-6 py-4 border-b items-center hover:bg-muted/20 transition">
+              <div className="col-span-4 font-medium">{plan.name}</div>
+              <div className="col-span-2">{plan.credits}</div>
+              <div className="col-span-2">{plan.currency} {plan.price}</div>
+              <div className="col-span-2">
+                <Badge variant={plan.isActive ? "default" : "destructive"}>
+                  {plan.isActive ? 'Active' : 'Inactive'}
+                </Badge>
+              </div>
+              <div className="col-span-2 text-right">
+                <Button size="sm" variant="ghost" onClick={() => {
+                  setEditingPlan(plan)
+                  setStatus(plan.isActive ? 'Active' : 'Inactive')
+                }}>
+                  <Edit className="h-4 w-4 mr-1" /> Edit
+                </Button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
 
       {/* --- EDIT MODAL --- */}
@@ -163,7 +171,6 @@ export default function ManagesPlansWrapper() {
           <DialogHeader><DialogTitle>Edit Plan Details</DialogTitle></DialogHeader>
           <div className="space-y-4 py-4">
             <Input 
-             
               value={editingPlan?.name || ''} 
               onChange={e => setEditingPlan(prev => prev ? {...prev, name: e.target.value} : null)} 
             />

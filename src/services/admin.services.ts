@@ -55,13 +55,34 @@ headers: {
   })
   return data
 }
-// export const getAllTransactionns = async (page,limit)=>{
-//     const cookieStore = await cookies()
+export const getAllPlans = async ()=>{
+    const cookieStore = await cookies()
 
-//   const {data} = await httpClient.get(`/payment/get-all-transactions?page=${page}&limit=${limit}`,{
-// headers: {
-//         "cookie": cookieStore.toString()
-//       }
-//   })
-//   return data
-// }
+  const {data} = await httpClient.get('/pricing',{
+headers: {
+        "cookie": cookieStore.toString()
+      }
+  })
+  return data
+}
+export const getAllTemplatePublic = async ()=>{
+    const cookieStore = await cookies()
+
+  const {data} = await httpClient.get('/template',{
+headers: {
+        "cookie": cookieStore.toString()
+      }
+  })
+  return data
+}
+export const getAllTemplateDetailsPublic = async (id)=>{
+    const cookieStore = await cookies()
+
+  const {data} = await httpClient.get(`/template/templateDetails/${id}`,{
+headers: {
+        "cookie": cookieStore.toString()
+      }
+  })
+  return data
+}
+

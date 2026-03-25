@@ -7,46 +7,20 @@ import JobMatcherDetails from "./JobMatcherAnalysisDetails";
 import { AnalysisSkeleton } from "./AnalysisDetailsSkelections";
 import { AnalysisError, AnalysisNotFound } from "./AnalysisNotFound";
 import { useQuery } from "@tanstack/react-query";
+import { getAnalysisDetails } from "@/services/analysis.services";
 
 interface Props {
   id: string;
 }
 
 const AnalysisDetailsWrapper = ({ id }: Props) => {
-  const [loading, setLoading] = useState<boolean>(true);
-  // const [data, setData] = useState<any>(null);
-  const [error, setError] = useState<string | null>(null);
+
  const cacheKey = `fetch-analysis-details-${id}`
-  // const fetchAnalysis = async () => {
-  //   try {
-  //     setLoading(true);
-  //     setError(null);
 
-  //     const response = await httpClient.post(`/analyzer/analysis/${id}`, null, {
-  //       headers: {
-  //         "Content-Type": "multipart/form-data",
-  //       },
-  //     });
 
-  //     setData(response?.data?.data || null);
-  //   } catch (err) {
-  //     console.error(err);
-  //     setError("Something went wrong while loading analysis.");
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const {data,isLoading,refetch,isError} = useQuery({queryKey:[cacheKey],queryFn: () =>  getAnalysisDetails(id)})
 
-  const {data,isLoading,refetch} = useQuery({queryKey:[cacheKey],queryFn:async () => httpClient.post(`/analyzer/analysis/${id}`,{},{
-      headers: {
-          "Content-Type": "multipart/form-data",
-        },
-  })})
-
-  // useEffect(() => {
-  //   if (id) fetchAnalysis();
-  // }, [id]);
-
+ 
   console.log(data);
   
 
@@ -58,7 +32,7 @@ const AnalysisDetailsWrapper = ({ id }: Props) => {
     );
   }
 
-  if (error) {
+  if (isError) {
   return <AnalysisError/>
   }
 
