@@ -34,12 +34,17 @@ export const getAnalysisDetails = async (id) =>{
 
 
 export const handleAnalysis = async (formData)=>{
+    const cookieStore = await cookies()
+
     const response = await httpClient.post(
         `/analyzer/parse-resume`, 
         formData,
         {
           headers: {
             "Content-Type": "multipart/form-data",
+            
+        "cookie": cookieStore.toString()
+      
           },
         }
       );
