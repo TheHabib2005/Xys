@@ -23,6 +23,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import httpClient from "@/lib/axios-client";
 import { AnalysisType } from "@/interfaces/enums";
+import { handleAnalysis } from "@/services/analysis.services";
 
 
 
@@ -125,18 +126,10 @@ const handleSubmit = async () => {
 
       // 4. Send Request via httpClient
       // Note: Use a template literal to define the specific endpoint for the type
-      const response = await httpClient.post(
-        `/analyzer/parse-resume`, 
-        formData,
-        {
-          headers: {
-            "Content-Type": "multipart/form-data",
-          },
-        }
-      );
+    
 
       // 5. Handle Success
-      const result = response.data; // Assuming your axios client returns data directly
+      const result = await handleAnalysis(formData) // Assuming your axios client returns data directly
       console.log(result);
       toast.success("starting")
       // // Redirect to the processing or results page using the ID from backend
@@ -146,7 +139,6 @@ const handleSubmit = async () => {
       // 6. Handle Errors
       console.error("Analysis Error:", error);
       const errorMessage = error.response?.data?.message || "Failed to upload resume. Please try again.";
-
     } finally {
       // 7. Stop Loading State
       setIsUploading(false);

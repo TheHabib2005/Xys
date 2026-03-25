@@ -31,3 +31,17 @@ export const getAnalysisDetails = async (id) =>{
   });
   return data
 }
+
+
+export const handleAnalysis = async (formData)=>{
+    const response = await httpClient.post(
+        `/analyzer/parse-resume`, 
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      return response.data
+}
