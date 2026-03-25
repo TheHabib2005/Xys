@@ -173,7 +173,8 @@ router.push(`/dashboard/templates/${id}/builder/${result.data.id}`)
             <Separator className="bg-border/60" />
 
             {/* Why This Template? */}
-            <section className="space-y-6">
+          {template.descriptions?.whyBest ?   <>
+          <section className="space-y-6">
               <div className="flex items-center gap-3">
                 <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-blue-500/10 text-blue-600">
                   <Zap className="h-5 w-5" />
@@ -193,7 +194,6 @@ router.push(`/dashboard/templates/${id}/builder/${result.data.id}`)
               </div>
             </section>
 
-            {/* Target Audience */}
             <section className="rounded-2xl bg-card border p-8 space-y-6">
               <div className="flex items-center gap-3">
                  <Target className="h-6 w-6 text-primary" />
@@ -207,21 +207,10 @@ router.push(`/dashboard/templates/${id}/builder/${result.data.id}`)
                  {template.descriptions.whichNeedToUseIt}
               </div>
             </section>
-
-            {/* Sections Breakdown */}
-            <section className="space-y-6">
-              <div className="flex items-center gap-3">
-                <Layout className="h-6 w-6 text-muted-foreground" />
-                <h3 className="text-xl font-bold">Included Sections</h3>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {/* {template.sections.map((section: string) => (
-                  <Badge key={section} variant="secondary" className="px-4 py-1.5 rounded-full capitalize">
-                    {section}
-                  </Badge>
-                ))} */}
-              </div>
-            </section>
+          </> :            <section className="space-y-6">{template.descriptions}</section>
+}
+          
+        
 
             {/* Trust Footer */}
             <div className="pt-6">

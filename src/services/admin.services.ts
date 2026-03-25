@@ -1,14 +1,26 @@
 "use server";
 
 import httpClient from "@/lib/axios-client";
+import { cookies } from "next/headers";
 
 
 export const updateUserStatus = async (id: string, status: string) => {
-  const { data } = await httpClient.patch(`/admin/users/${id}/status`, { status })
+    const cookieStore = await cookies()
+
+  const { data } = await httpClient.patch(`/admin/users/${id}/status`, { status },{
+     headers: {
+        "cookie": cookieStore.toString()
+      }
+  })
   return data
 }
 
 export const deleteUser = async (id: string) => {
-  const { data } = await httpClient.delete(`/admin/users/${id}`)
+    const cookieStore = await cookies()
+  const { data } = await httpClient.delete(`/admin/users/${id}`,{
+     headers: {
+        "cookie": cookieStore.toString()
+      }
+  })
   return data
 }

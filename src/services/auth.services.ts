@@ -125,18 +125,26 @@ export async function  isTokenExpiringSoon(token: string) {
 export const changePassword = async (payload) =>{
       const cookieStore = await cookies()
 
+
 try {
-    const {data} = await  httpClient.put("/auth/change-password", payload,{
+      const res = await  httpClient.put("/auth/change-password", payload,{
       headers: {
             "cookie": cookieStore.toString()
-
       }
   });
-return data
-} catch (error) {
-  console.log(error);
   
+ if(res.data){
+  return  {success:true,message:res.data.message}
+ }
+   
+} catch (err:any) {
+   const message = err.response?.data?.message || err.message || "An error occurred";
+    return {
+      success:false,
+      message
+    }
 }
+
 }
 
 

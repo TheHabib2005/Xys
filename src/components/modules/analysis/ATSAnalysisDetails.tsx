@@ -34,8 +34,8 @@ interface AnalysisPageProps {
 
 export default function AnalysisDetails({ analysisData,onRetry,cacheKey  }: AnalysisPageProps) {
 
-  const analysisResult =  analysisData ? analysisData.result : analysisData;
-console.log(analysisResult);
+  const analysisResult =  analysisData.result ? analysisData.result : analysisData;
+console.log(analysisData);
 
   const [activeTab, setActiveTab] = useState("overview");
   const [isReportGenerated, setIsReportGenerated] = useState( analysisData.reportUrl || "");
@@ -47,7 +47,7 @@ console.log(analysisResult);
   }
 
   const reportMutation = useApiMutation({
-    endpoint:`/analyzer/analysis/generate-report/${analysisResult.id}`,
+    endpoint:`/analyzer/analysis/generate-report/${analysisData.id || analysisResult.id} `,
     actionName:"Generate Report",
     actionType:"SERVER_SIDE",
     method:"POST"
@@ -105,15 +105,15 @@ console.log(analysisResult);
             </h1>
           </div>
           <div className="flex gap-3 w-full md:w-auto">
-            <SaveAnalysisResult id={analysisResult.id} cacheKey={cacheKey} />
+            <SaveAnalysisResult id={analysisData.id || analysisResult.id} cacheKey={cacheKey} />
 
 
-        { analysisResult.reportUrl !== null ? <Button 
+         <Button 
             disabled={reportMutation.isPending}
             onClick={()=>generateAtsReport(analysisResult)}
             variant="outline" className="rounded-xl border-border/60 hover:border-primary/30 hover:bg-primary/5 transition-all duration-300 flex-1 md:flex-none">
              {!reportMutation.isPending ? <> <Download className="mr-2 h-4 w-4" /> Generate Report</> : <> <Loader className="mr-2 h-4 w-4 animate-spin" /> Generating Report</>}
-            </Button> : null}
+            </Button> 
             
           </div>
         </header>

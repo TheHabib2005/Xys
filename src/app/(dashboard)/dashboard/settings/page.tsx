@@ -1,12 +1,12 @@
 import ChangePassword from '@/components/modules/auth/ChangePassword'
 import React from 'react'
 
-const AdminSettingsPage = () => {
+const UserSettingsPage = () => {
   return (
     <div>
-      <ChangePassword/>
+        <ChangePassword/>
     </div>
   )
 }
 
-export default AdminSettingsPage
+export default UserSettingsPage

@@ -57,7 +57,14 @@ export function SignupForm() {
         name:data.email
       }
       
-      await handleSignup(payload)
+      const result = await handleSignup(payload);
+
+
+      if(result.success){
+        const url = `/verify-email?email${result.data.user.email}`
+        router.push(url)
+      }
+
       setIsModalOpen(true)
       
   }
