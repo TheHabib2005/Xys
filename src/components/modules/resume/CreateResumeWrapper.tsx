@@ -137,6 +137,7 @@ export default function CreateResumeWrapper() {
         {/* Template Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
           {/* custom card */}
+          <Link href={"/dashboard/resumes/builder/657655"}>
            <motion.div
             whileHover={{ y: -5 }}
             className="group relative cursor-pointer rounded-3xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-8 flex flex-col items-center justify-center text-center transition-all hover:border-zinc-400 dark:hover:border-zinc-600 shadow-sm"
@@ -149,6 +150,7 @@ export default function CreateResumeWrapper() {
               Start from scratch and build your resume your way.
             </p>
           </motion.div>
+          </Link>
          
          
         </div>
