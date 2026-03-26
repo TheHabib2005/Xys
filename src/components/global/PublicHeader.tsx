@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { Sun, Moon, LogIn } from "lucide-react";
+import { Sun, Moon, Menu, X, ChevronRight } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useTheme } from "next-themes";
 import Link from "next/link";
@@ -24,13 +24,18 @@ export default function PublicHeader() {
 
   const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const handleScroll = () => setScrolled(window.scrollY > 10);
+    const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   const navLinks = [
     { label: "Home", path: "/" },
@@ -38,124 +43,133 @@ export default function PublicHeader() {
     { label: "Pricing", path: "/pricing" },
     { label: "Reviews", path: "/reviews" },
     { label: "About", path: "/about-us" },
+    { label: "Contact", path: "/contact-us" },
   ];
 
   if (!mounted) return null;
 
   return (
-    <header
-      className={cn(
-        "sticky top-0 z-50 w-full transition-all duration-500",
-        // Height reduction: h-14 instead of default padding
-        "h-20 flex items-center", 
-        scrolled 
-          ? "bg-white/70 dark:bg-[#01020c]/70 backdrop-blur-md border-b border-border/40 shadow-sm" 
-          : "bg-transparent border-b border-transparent"
-      )}
-    >
-      <div className="max-w-[1440px] w-full mx-auto px-4 md:px-6 flex items-center justify-between">
-        
-        {/* LEFT: Branding */}
-        <div className="scale-90 origin-left">
-          <Logo />
-        </div>
-
-        {/* CENTER: Navigation (Minimalist) */}
-        <nav className="hidden md:flex items-center gap-1">
-          {navLinks.map((link) => {
-            const active = pathname === link.path;
-            return (
-              <Link
-                key={link.path}
-                href={link.path}
-                className={cn(
-                  "relative px-3 py-1 text-sm font-medium transition-colors rounded-lg",
-                  active ? "text-primary" : "text-muted-foreground hover:text-foreground"
-                )}
-              >
-                {link.label}
-                {active && (
-                  <motion.div
-                    layoutId="public-pill"
-                    className="absolute inset-0 bg-primary/5 border-b-2 border-primary rounded-none z-[-1]"
-                    transition={{ type: "spring", bounce: 0, duration: 0.4 }}
-                  />
-                )}
-              </Link>
-            );
-          })}
-        </nav>
-
-        {/* RIGHT: User Actions */}
-        <div className="flex items-center gap-2">
-          {/* Theme Toggle */}
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8 rounded-lg"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          >
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </Button>
-
-          <AnimatePresence mode="wait">
-            {user ? (
-              <motion.div 
-                key="user-active"
-                initial={{ opacity: 0, y: -5 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="flex items-center gap-2"
-              >
-                {user.user.role === UserRole.USER && (
-                  <div className="scale-90">
-                    <CreditWallet />
-                  </div>
-                )}
-                <UserProfile user={user} />
-              </motion.div>
-            ) : (
-              <motion.div 
-                key="user-guest"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="flex items-center gap-2"
-              >
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
-                  className="hidden sm:flex h-8 text-xs"
-                  onClick={() => router.push("/sign-in")}
-                >
-                  Log in
-                </Button>
-                <Button 
-                  size="sm"
-                  className="h-8 px-4 text-xs bg-primary rounded-lg shadow-md"
-                  onClick={() => router.push("/sign-up")}
-                >
-                  Get Started
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </div>
-      </div>
-
-      {/* MOBILE BOTTOM NAV */}
-      <div className="md:hidden fixed bottom-0 left-0 w-full h-12 border-t border-border/50 bg-background/60 backdrop-blur-xl flex justify-around items-center">
-        {navLinks.slice(0, 4).map((link) => (
-          <Link 
-            key={link.path} 
-            href={link.path}
-            className={cn(
-              "text-[10px] font-bold uppercase tracking-tighter transition-colors", 
-              pathname === link.path ? "text-primary" : "text-muted-foreground"
-            )}
-          >
-            {link.label}
+    <>
+      <header
+        className={cn(
+          "fixed top-0 left-0 right-0 z-[100] transition-all duration-300",
+          "h-16 md:h-20 flex items-center",
+          scrolled
+            ? "bg-white/80 dark:bg-[#01020c]/80 backdrop-blur-xl border-b border-border/50 shadow-sm"
+            : "bg-transparent border-b border-transparent"
+        )}
+      >
+        <div className="max-w-[1440px] w-full mx-auto px-4 md:px-8 flex items-center justify-between">
+          
+          {/* LEFT: Logo */}
+          <Link href="/" className="scale-90 md:scale-100 origin-left">
+            <Logo />
           </Link>
-        ))}
-      </div>
-    </header>
+
+          {/* CENTER: Desktop Nav (Hidden on Mobile) */}
+          <nav className="hidden lg:flex items-center gap-1 bg-muted/50 border border-border/50 p-1 rounded-2xl">
+            {navLinks.map((link) => {
+              const active = pathname === link.path;
+              return (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={cn(
+                    "relative px-4 py-1.5 text-sm font-semibold transition-all rounded-xl",
+                    active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  {link.label}
+                  {active && (
+                    <motion.div
+                      layoutId="nav-active-pill"
+                      className="absolute inset-0 bg-background border border-border/50 shadow-sm rounded-xl z-[-1]"
+                      transition={{ type: "spring", duration: 0.6 }}
+                    />
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+
+          {/* RIGHT: Essential Actions (Theme, Avatar, Menu) */}
+          <div className="flex items-center gap-1.5 md:gap-3">
+            
+            {/* Theme Toggle - Always Visible */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-9 w-9 rounded-xl border border-transparent hover:border-border"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+            >
+              {theme === "dark" ? <Sun className="h-4.5 w-4.5 text-yellow-500" /> : <Moon className="h-4.5 w-4.5 text-blue-600" />}
+            </Button>
+
+            {/* Auth Section - Always Visible */}
+            <div className="flex items-center gap-2">
+              {user ? (
+                <div className="flex items-center gap-2">
+                  <div className="hidden sm:block">
+                    {user.user.role === UserRole.USER && <CreditWallet />}
+                  </div>
+                  <UserProfile user={user} />
+                </div>
+              ) : (
+                <Button 
+                  size="sm" 
+                  onClick={() => router.push("/sign-in")} 
+                  className="h-9 px-4 bg-primary text-white rounded-xl text-xs font-bold"
+                >
+                  Sign In
+                </Button>
+              )}
+            </div>
+
+            {/* Mobile Menu Toggle - Visible only on mobile */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden h-9 w-9 rounded-xl bg-muted/50 border border-border"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
+              {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          </div>
+        </div>
+      </header>
+
+      {/* MOBILE MENU CONTENT: ONLY LINKS */}
+      <AnimatePresence>
+        {mobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            className="fixed inset-0 z-[80] lg:hidden bg-background/95 backdrop-blur-2xl pt-24 px-6 pb-10"
+          >
+            <div className="flex flex-col gap-2">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground ml-2 mb-2">Menu</p>
+              {navLinks.map((link) => (
+                <Link
+                  key={link.path}
+                  href={link.path}
+                  className={cn(
+                    "flex items-center justify-between p-4 rounded-2xl text-xl font-bold transition-all",
+                    pathname === link.path 
+                      ? "bg-primary text-white shadow-lg shadow-primary/20" 
+                      : "bg-muted/30 text-foreground hover:bg-muted"
+                  )}
+                >
+                  {link.label}
+                  <ChevronRight className={cn("w-5 h-5", pathname === link.path ? "opacity-100" : "opacity-30")} />
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+      
+      <div className="h-16 md:h-20" />
+    </>
   );
 }

@@ -27,7 +27,7 @@ export function HeroSection() {
 
   return (
 
-      <section className="relative w-full overflow-hidden bg-background pt-16 md:pt-28 pb-20">
+      <section className="relative w-full overflow-hidden bg-background pt-28 pb-20">
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 dark:opacity-40">
         <svg className="absolute top-0 left-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
           <defs>

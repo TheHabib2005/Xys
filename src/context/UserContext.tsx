@@ -76,7 +76,7 @@ export default function UserContextWrapper({ children }: { children: React.React
 
   // Loading overlay
   if (isQueryLoading) {
-    return <AppLoader />;
+    // return <AppLoader />;
   }
 
   const contextValue: IUserContext = {

@@ -109,7 +109,7 @@ export function TestimonialsSection() {
   }
 
   return (
-    <section className="relative w-full overflow-hidden bg-gradient-to-b from-gray-50 to-white dark:from-slate-950 dark:to-slate-900 py-16 md:py-24">
+    <section className="relative w-full overflow-hidden bg-background py-16 md:py-24">
       {/* Animated background elements */}
       <div className="absolute inset-0 -z-10">
         <div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-400/20 dark:bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
