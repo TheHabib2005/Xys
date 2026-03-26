@@ -98,7 +98,7 @@ export const PricingCard = ({ plan, isPopular = false, index }: PricingCardProps
     }
     const payload = {
       planId,
-      "cancelUrl": `${envVeriables.NEXT_PUBLIC_APP_URL}/dashboard/payments`,
+      "cancelUrl": `${envVeriables.NEXT_PUBLIC_APP_URL}/dashboard/payments/cancel`,
       "successUrl": `${envVeriables.NEXT_PUBLIC_APP_URL}/dashboard/payments`
     }
     const result = await buyCreditMutation.mutateAsync(payload)
