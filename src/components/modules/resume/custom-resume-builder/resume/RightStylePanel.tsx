@@ -29,30 +29,12 @@ interface RightStylePanelProps {
 export function RightStylePanel({ styles, setStyles, resetStyles }: RightStylePanelProps) {
   return (
     <aside className="w-[300px] shrink-0 border-l border-border bg-card flex flex-col h-full overflow-y-auto" aria-label="Style controls">
-      {/* AI Suggestions */}
-      <div className="p-4 border-b border-border">
-        <div className="rounded-lg bg-primary/5 border border-primary/10 p-3.5">
-          <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="h-4 w-4 text-primary" />
-            <span className="text-xs font-semibold text-foreground">AI Suggestions</span>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed mb-3">
-            3 improvements found to strengthen your resume for this role.
-          </p>
-          <div className="flex gap-2">
-            <Button variant="outline" size="sm" className="h-7 text-[11px] flex-1">Dismiss</Button>
-            <Button size="sm" className="h-7 text-[11px] flex-1">Apply</Button>
-          </div>
-        </div>
-      </div>
-
       {/* Typography */}
       <div className="p-4 border-b border-border space-y-4">
         <div className="flex items-center gap-2">
           <Type className="h-3.5 w-3.5 text-muted-foreground" />
           <Label className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground">Typography</Label>
         </div>
-
         <div className="space-y-1.5">
           <Label className="text-[11px] text-muted-foreground">Font Family</Label>
           <DropdownMenu>
@@ -84,7 +66,6 @@ export function RightStylePanel({ styles, setStyles, resetStyles }: RightStylePa
           </div>
           <Slider value={[styles.fontSize]} onValueChange={([v]) => setStyles({ fontSize: v })} min={10} max={24} step={1} />
         </div>
-
         <div className="space-y-1.5">
           <div className="flex items-center justify-between">
             <Label className="text-[11px] text-muted-foreground">Line Height</Label>

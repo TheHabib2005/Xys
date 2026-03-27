@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { 
   Check, Loader2, WifiOff, ChevronDown, 
-  Download, MoreHorizontal 
+  Download, MoreHorizontal, AlertCircle, Coins
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,9 +10,20 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import type { SaveStatus } from '@/interfaces/custom-resume-builder';
 import { downloadCustomResumeHandler } from '@/services/resume.services';
-import { toast } from 'sonner'; // Recommendation: Use sonner for status messages
+import { toast } from 'sonner';
 
 interface TopNavBarProps {
   saveStatus: SaveStatus;
@@ -20,87 +31,81 @@ interface TopNavBarProps {
 }
 
 export function TopNavBar({ saveStatus, documentTitle }: TopNavBarProps) {
-  // Loading state management
   const [isExporting, setIsExporting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Resume body content (Ideally, get this from your editor state)
-  const body = {
-    "htmlContent": document.getElementById('resume-canvas')?.outerHTML || ""
+
+  const triggerFileDownload = async (url: string) => {
+    const fileResponse = await fetch(url);
+    const blob = await fileResponse.blob();
+    const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+    const downloadUrl = window.URL.createObjectURL(pdfBlob);
+
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download = `${documentTitle || 'Resume'}.pdf`;
+    document.body.appendChild(link);
+    link.click();
+    
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(downloadUrl);
   };
 
-const handleDownload = async () => {
-  try {
-    setIsExporting(true);
-    
-    // ১. ব্যাকেন্ড থেকে রেসপন্স আনুন (URL টা নিন)
-    const response = await downloadCustomResumeHandler("8954245", body);
-
-    if (response?.success && response?.data?.secure_url) {
-      console.log(response.data.secure_url);
+  const handleDownload = async () => {
+    try {
+      setIsExporting(true);
       
-      // ২. সরাসরি ক্লাউডিনারি URL থেকে ফাইলটা Fetch করুন
-      const fileResponse = await fetch(response.data.secure_url);
-      
-      // ৩. এটাকে অবশ্যই BLOB হিসেবে নিতে হবে
-      const blob = await fileResponse.blob();
+     
+      const canvas = document.getElementById('resume-canvas');
+      if (canvas) {
+        const inputs = canvas.querySelectorAll('input, textarea');
+        inputs.forEach((input: any) => {
+          input.setAttribute('value', input.value);
+        });
+      }
 
-      // ৪. ব্লব টাইপ ফিক্স করে দিন (যাতে ব্রাউজার কনফিউজ না হয়)
-      const pdfBlob = new Blob([blob], { type: 'application/pdf' });
+      const body = {
+        htmlContent: canvas?.outerHTML || ""
+      };
 
-      // ৫. একটি ভার্চুয়াল URL তৈরি করুন
-      const downloadUrl = window.URL.createObjectURL(pdfBlob);
+      const response = await downloadCustomResumeHandler("8954245", body);
 
-      // ৬. ডাউনলোড ট্রিগার করুন
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = `${documentTitle || 'Resume'}.pdf`;
-      document.body.appendChild(link);
-      link.click();
+      if (response?.success && response?.data) {
+        // Cloudinary URL theke download
+        await triggerFileDownload(response.data);
 
-      // ৭. ক্লিনআপ (মেমরি বাঁচানোর জন্য)
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(downloadUrl);
-
-      setIsSuccess(true);
-      toast.success("Download Successful!");
-      setTimeout(() => setIsSuccess(false), 3000);
+        setIsSuccess(true);
+        toast.success("Resume exported successfully!");
+        setTimeout(() => setIsSuccess(false), 3000);
+      } else {
+        throw new Error("Invalid response from server");
+      }
+    } catch (error) {
+      console.error("Export failed:", error);
+      toast.error("Could not generate PDF. Please try again.");
+    } finally {
+      setIsExporting(false);
     }
-  } catch (error) {
-    console.error("Download fail:", error);
-    toast.error("Download logic error!");
-  } finally {
-    setIsExporting(false);
-  }
-};
+  };
 
   return (
     <header className="h-14 border-b border-border bg-card flex items-center px-5 shrink-0">
+      {/* Left: Document Info */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 cursor-pointer hover:bg-accent/50 px-2 py-1 rounded-md transition-colors">
           <span className="text-sm font-semibold text-foreground">{documentTitle}</span>
           <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
         </div>
 
-        {/* Save Status Indicators */}
-        <div className="flex items-center gap-1.5 text-xs text-muted-foreground ml-2 pl-3 border-l border-border">
+        <div className="flex items-center gap-1.5 text-[11px] font-medium text-muted-foreground ml-2 pl-3 border-l border-border uppercase tracking-wider">
           {saveStatus === 'saved' && (
-            <>
-              <Check className="h-3.5 w-3.5" style={{ color: 'hsl(142, 76%, 36%)' }} />
-              <span>Saved</span>
-            </>
+            <><Check className="h-3 w-3 text-emerald-500" /> <span>Saved</span></>
           )}
           {saveStatus === 'saving' && (
-            <>
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-              <span>Saving…</span>
-            </>
+            <><Loader2 className="h-3 w-3 animate-spin text-primary" /> <span>Saving...</span></>
           )}
           {saveStatus === 'offline' && (
-            <>
-              <WifiOff className="h-3.5 w-3.5 text-destructive" />
-              <span className="text-destructive">Offline</span>
-            </>
+            <><WifiOff className="h-3 w-3 text-destructive" /> <span className="text-destructive">Offline</span></>
           )}
           {saveStatus === 'idle' && <span>Ready</span>}
         </div>
@@ -109,32 +114,60 @@ const handleDownload = async () => {
       <div className="flex-1" />
 
       {/* Right: Actions */}
-      <div className="flex items-center gap-2">
-        <Button 
-          size="sm" 
-          disabled={isExporting} 
-          onClick={handleDownload}
-          className={`h-8 text-xs gap-1.5 transition-all ${isSuccess ? 'bg-green-600 hover:bg-green-700' : ''}`}
-        >
-          {isExporting ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : isSuccess ? (
-            <Check className="h-3.5 w-3.5" />
-          ) : (
-            <Download className="h-3.5 w-3.5" />
-          )}
-          {isExporting ? "Exporting..." : isSuccess ? "Ready!" : "Download PDF"}
-        </Button>
+      <div className="flex items-center gap-3">
+        
+        <AlertDialog>
+          <AlertDialogTrigger asChild>
+            <Button 
+              size="sm" 
+              disabled={isExporting} 
+              className={`h-8 text-xs gap-2 px-4 shadow-sm transition-all duration-300 ${
+                isSuccess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-primary hover:bg-primary/90'
+              }`}
+            >
+              {isExporting ? (
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+              ) : isSuccess ? (
+                <Check className="h-3.5 w-3.5" />
+              ) : (
+                <Download className="h-3.5 w-3.5" />
+              )}
+              {isExporting ? "Processing..." : isSuccess ? "Done!" : "Download PDF"}
+            </Button>
+          </AlertDialogTrigger>
+          
+          <AlertDialogContent className="max-w-[400px]">
+            <AlertDialogHeader>
+              <div className="mx-auto bg-amber-50 w-12 h-12 rounded-full flex items-center justify-center mb-2">
+                <Coins className="h-6 w-6 text-amber-600" />
+              </div>
+              <AlertDialogTitle className="text-center">Export Premium Resume</AlertDialogTitle>
+              <AlertDialogDescription className="text-center">
+                This action will consume <span className="font-bold text-foreground">10 Credits</span> from your balance. Are you sure you want to proceed with the high-quality PDF export?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="sm:justify-center gap-2">
+              <AlertDialogCancel className="mt-0 h-9">Cancel</AlertDialogCancel>
+              <AlertDialogAction 
+                onClick={handleDownload}
+                className="bg-primary h-9"
+              >
+                Confirm & Download
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground">
-              <MoreHorizontal className="h-4 w-4" />
+            <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full border border-transparent hover:border-border transition-all">
+              <MoreHorizontal className="h-4 w-4 text-muted-foreground" />
             </Button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem>Rename Document</DropdownMenuItem>
-            <DropdownMenuItem className="text-destructive">Delete</DropdownMenuItem>
+          <DropdownMenuContent align="end" className="w-48">
+            <DropdownMenuItem className="text-xs py-2 cursor-pointer">Rename Document</DropdownMenuItem>
+            <DropdownMenuItem className="text-xs py-2 cursor-pointer">Duplicate Template</DropdownMenuItem>
+            <DropdownMenuItem className="text-xs py-2 text-destructive cursor-pointer">Delete Forever</DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

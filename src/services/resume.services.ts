@@ -46,17 +46,6 @@ export const deleteResume  = async (resumeId:string) =>{
     return null
 }
 
-// export const downloadResumeHandler = async (builderId) =>{
-//        const cookieStore = await cookies()
-
-//     const result = await  httpClient.post(`/resume/${builderId}/generate-download`,{},{
-//         headers:{
-//              "cookie":cookieStore.toString(),
-//                timeout: 30000, // 30 seconds
-//         }
-//        })
-// return result.data
-// }
 
 
 

@@ -2,13 +2,9 @@
 
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import {
-  useForm,
-  FormProvider,
-} from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { motion, AnimatePresence } from "framer-motion";
-import { format } from "date-fns";
 import {
   ArrowLeft,
   Loader2,
@@ -18,34 +14,37 @@ import {
   Check,
   AlertCircle,
   Download,
-  Cloud,
-  CloudOff,
   MonitorOff,
+  Coins, // Added for credit icon
 } from "lucide-react";
-import Handlebars from "handlebars";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { SkeletonBuilder } from "./SkelectionBuilder";
-import { useApiQuery } from "@/hooks/useApiQuery";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 import type { DynamicSection } from "@/interfaces/builder";
 import {
   countErrorsForSection,
-  deepEqual,
   generateZodSchema,
   normalizeResumeData,
-} from "@/validations-schemas/auth/resume-builder.schema"
+} from "@/validations-schemas/auth/resume-builder.schema";
 import { SectionRenderer } from "./builder/ResumeBuilderField";
 import { ResumePreview } from "./ResumePreview";
-import httpClient from "@/lib/axios-client";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { downloadResumeHandler, updateResumeName } from "@/services/resume.services";
 import { getAllTemplateDetailsPublic } from "@/services/admin.services";
 import { useQuery } from "@tanstack/react-query";
-import { useApiMutation } from "@/hooks/useApiMutation";
 import { useUser } from "@/context/UserContext";
-
 
 export default function PremiumResumeBuilder({
   id,
@@ -56,8 +55,8 @@ export default function PremiumResumeBuilder({
 }) {
   const router = useRouter();
   const headerRef = useRef<HTMLDivElement | null>(null);
-const searchParams = useSearchParams();
-  const page_mode = searchParams.get('mode')// e.g., if URL is /page?name=test
+  const searchParams = useSearchParams();
+  const page_mode = searchParams.get("mode");
   const [currentStep, setCurrentStep] = useState(0);
   const [showMobilePreview, setShowMobilePreview] = useState(false);
   const [reviewMode, setReviewMode] = useState(false);
@@ -69,26 +68,14 @@ const searchParams = useSearchParams();
     Record<string, { valid: boolean; count: number; fields: string[] }>
   >({});
 
-  
-  const {user} = useUser();
-  
-  const { data: apiResponse, isFetching } = useQuery(
-    {
-      queryKey:[`templates-${id}`],
-      queryFn:()=>getAllTemplateDetailsPublic(id)
-    }
-  )
+  const { user } = useUser();
 
+  const { data: apiResponse, isFetching } = useQuery({
+    queryKey: [`templates-${id}`],
+    queryFn: () => getAllTemplateDetailsPublic(id),
+  });
 
-  
   const template: any = apiResponse?.data;
-  console.log(template);
-
-
-  
-
-
-  
 
   const sections: DynamicSection[] = useMemo(
     () => [...(template?.sections || [])].sort((a, b) => a.order - b.order),
@@ -108,31 +95,31 @@ const searchParams = useSearchParams();
 
   useEffect(() => {
     if (!template) return;
-   const crr = template && template?.resume?.filter((res) => {
-     return res.id === builderId
-    })
+    const crr =
+      template &&
+      template?.resume?.filter((res: any) => {
+        return res.id === builderId;
+      });
 
-    console.log(crr);
-    
-
-    const normalized = normalizeResumeData(sections, crr.length > 0 && crr[0].resumeData ? crr[0].resumeData : {});
+    const normalized = normalizeResumeData(
+      sections,
+      crr.length > 0 && crr[0].resumeData ? crr[0].resumeData : {}
+    );
     reset(normalized);
     setLastSaved(new Date());
     setCurrentStep(0);
     setReviewMode(false);
-  }, [template, reset, sections]);
-
+  }, [template, reset, sections, builderId]);
 
   const [isDesktop, setIsDesktop] = React.useState(true);
 
-  // Check for desktop device
   React.useEffect(() => {
     const checkDevice = () => {
       setIsDesktop(window.innerWidth >= 1024);
     };
     checkDevice();
-    window.addEventListener('resize', checkDevice);
-    return () => window.removeEventListener('resize', checkDevice);
+    window.addEventListener("resize", checkDevice);
+    return () => window.removeEventListener("resize", checkDevice);
   }, []);
 
   const progressPercent = useMemo(() => {
@@ -183,47 +170,35 @@ const searchParams = useSearchParams();
   }, [reviewMode]);
 
   const onSubmit = async (data: any) => {
-      setIsGenerating(true);
-       const result =  await updateResumeName(builderId,{resumeData:data,templateId:id} );
-  if(result.success){
- toast.success("Resume saved successfully!");
-    setLastSaved(new Date());
-    setIsGenerating(false);
-  }
-   
+    setIsGenerating(true);
+    const result = await updateResumeName(builderId, {
+      resumeData: data,
+      templateId: id,
+    });
+    if (result.success) {
+      toast.success("Resume saved successfully!");
+      setLastSaved(new Date());
+      setIsGenerating(false);
+    }
   };
-  
-
-
 
   const handleGenerateResume = async () => {
     if (!template?.htmlLayout) return;
 
-    setIsDownloading(true);
-
-   if(user?.wallet?.balance as number < 10){
-    toast.error("no banlace")
-    setIsDownloading(false)
- return 
-   }
+    if ((user?.wallet?.balance as number) < 10) {
+      toast.error("Insufficient balance. 10 credits required.");
+      return;
+    }
 
     try {
-      
-    const result = await downloadResumeHandler(builderId)
+      setIsDownloading(true);
+      const result = await downloadResumeHandler(builderId);
 
-
-      if(result.success){
-        console.log(result.data);
-     
+      if (result.success) {
         setShowSuccessModal(true);
-
-        handleClickDownload(result.data.resumeUrl)
-
+        handleClickDownload(result.data.resumeUrl);
         toast.success("Your Resume is Downloaded");
       }
-
-     
-
     } catch (err) {
       toast.error("Failed to generate resume");
     } finally {
@@ -231,15 +206,14 @@ const searchParams = useSearchParams();
     }
   };
 
-  const handleClickDownload = (url:string)=>{
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `${template.slug || "resume"}.html`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-  }
+  const handleClickDownload = (url: string) => {
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `${template.slug || "resume"}.html`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const nextStep = async () => {
     if (reviewMode) {
@@ -277,16 +251,18 @@ const searchParams = useSearchParams();
 
   const activeSection = sections[currentStep];
 
-    if (!isDesktop) {
+  if (!isDesktop) {
     return (
       <div className="flex h-screen w-full flex-col items-center justify-center bg-background p-6 text-center">
         <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-primary/10 text-primary">
           <MonitorOff className="h-10 w-10" />
         </div>
-        <h1 className="mb-2 text-2xl font-black uppercase tracking-tight text-foreground">Desktop Required</h1>
+        <h1 className="mb-2 text-2xl font-black uppercase tracking-tight text-foreground">
+          Desktop Required
+        </h1>
         <p className="max-w-md text-muted-foreground">
-          The Template Builder is a professional tool designed for large screens. 
-          Please switch to a desktop or laptop device to continue designing.
+          The Template Builder is a professional tool designed for large screens. Please
+          switch to a desktop or laptop device to continue designing.
         </p>
       </div>
     );
@@ -298,8 +274,6 @@ const searchParams = useSearchParams();
         ref={headerRef}
         className="h-16 border-b px-4 sm:px-6 flex items-center justify-between bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl z-50"
       >
-        
-     
         <div className="flex items-center gap-3">
           <Button
             type="button"
@@ -327,37 +301,65 @@ const searchParams = useSearchParams();
             {showMobilePreview ? "Hide" : "Preview"}
           </Button>
 
-         
+          {page_mode === "edit" && (
+            <Button
+              type="submit"
+              onClick={() => onSubmit(formData)}
+              disabled={isGenerating}
+              className="bg-blue-600 text-white hover:bg-blue-700 rounded-xl px-4 sm:px-5 font-medium h-9"
+            >
+              {isGenerating ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4 mr-2" />
+              )}
+              Save Changes
+            </Button>
+          )}
 
-        {page_mode === "edit" &&   <Button
-                    type="submit"
-                    onClick={() =>onSubmit(formData)}
-                    disabled={isGenerating}
-                    className="bg-blue-600 text-white hover:bg-blue-700 rounded-xl px-4 sm:px-5 font-medium"
-                  >
-                    {isGenerating ? (
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                    ) : (
-                      <Save className="h-4 w-4 mr-2" />
-                    )}
-                    Save Changes
-                  </Button>}
-
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            onClick={handleGenerateResume}
-            disabled={isDownloading}
-            className="rounded-full"
-          >
-            {isDownloading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Download className="h-4 w-4" />
-            )}
-            <span className="ml-2 hidden sm:inline">Generate Resume</span>
-          </Button>
+          {/* Premium Download with Confirmation Dialog */}
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                disabled={isDownloading}
+                className="rounded-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm h-9 hover:bg-zinc-50"
+              >
+                {isDownloading ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )}
+                <span className="ml-2 hidden sm:inline text-xs font-semibold">Generate Resume</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent className="max-w-[400px] rounded-2xl">
+              <AlertDialogHeader>
+                <div className="mx-auto bg-amber-100 dark:bg-amber-900/30 w-14 h-14 rounded-full flex items-center justify-center mb-4">
+                  <Coins className="h-7 w-7 text-amber-600 dark:text-amber-500" />
+                </div>
+                <AlertDialogTitle className="text-center text-xl font-bold">
+                  Confirm Export
+                </AlertDialogTitle>
+                <AlertDialogDescription className="text-center text-zinc-500 dark:text-zinc-400">
+                  Exporting this premium template will deduct <span className="font-bold text-zinc-900 dark:text-zinc-100">10 Credits</span> from your balance.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter className="sm:justify-center gap-3 mt-4">
+                <AlertDialogCancel className="rounded-xl border-zinc-200 dark:border-zinc-800 text-xs">
+                  Cancel
+                </AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleGenerateResume}
+                  className="bg-zinc-900 text-white dark:bg-white dark:text-black rounded-xl hover:opacity-90 px-6 text-xs font-bold"
+                >
+                  Confirm & Export
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
 
@@ -533,7 +535,7 @@ const searchParams = useSearchParams();
                       ? setReviewMode(false)
                       : setCurrentStep((s) => Math.max(0, s - 1))
                   }
-                  className="rounded-xl"
+                  className="rounded-xl h-9"
                 >
                   <ChevronLeft className="h-5 w-5 mr-1" /> Back
                 </Button>
@@ -558,7 +560,6 @@ const searchParams = useSearchParams();
                       }`}
                     />
                   </div>
-
                   <div className="ml-3 text-xs text-zinc-500">
                     Progress: {progressPercent}%
                   </div>
@@ -571,7 +572,7 @@ const searchParams = useSearchParams();
                     type="submit"
                     onClick={handleSubmit(onSubmit)}
                     disabled={isGenerating}
-                    className="bg-blue-600 text-white hover:bg-blue-700 rounded-xl px-4 sm:px-5 font-medium"
+                    className="bg-blue-600 text-white hover:bg-blue-700 rounded-xl px-4 sm:px-5 font-medium h-9"
                   >
                     {isGenerating ? (
                       <Loader2 className="h-4 w-4 animate-spin" />
@@ -584,7 +585,7 @@ const searchParams = useSearchParams();
                   <Button
                     type="button"
                     onClick={nextStep}
-                    className="bg-zinc-900 text-white dark:bg-white dark:text-black rounded-xl px-4 sm:px-5 font-medium"
+                    className="bg-zinc-900 text-white dark:bg-white dark:text-black rounded-xl px-4 sm:px-5 font-medium h-9"
                   >
                     Next <ChevronRight className="h-4 w-4 ml-2" />
                   </Button>
@@ -602,7 +603,6 @@ const searchParams = useSearchParams();
           <ResumePreview template={template} data={formData} />
         </section>
       </main>
-
     </div>
   );
 }

@@ -61,7 +61,7 @@ export function SignupForm() {
 
 
       if(result.success){
-        const url = `/verify-email?email${result.data.user.email}`
+        const url = `/verify-email?email=${result.data.user.email}`
         router.push(url)
       }
 
