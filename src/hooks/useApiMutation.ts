@@ -56,7 +56,11 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
         (data as any)?.message || 
         "Action completed successfully";
 
-      toast.success(finalSuccessMessage);
+    if(data.success){
+        toast.success(finalSuccessMessage);
+    }else{
+        toast.error(finalSuccessMessage);
+    }
 
       // 2. Invalidate Queries
       if (invalidateKeys) {
@@ -79,7 +83,7 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
         configError || 
         apiErrorMessage || 
         "Something went wrong.";
-
+alert("error")
       toast.error(finalErrorMessage, {
         description: `Error Code: ${error.response?.status || "Unknown"}`,
       });

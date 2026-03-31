@@ -24,6 +24,9 @@ import {
 import type { SaveStatus } from '@/interfaces/custom-resume-builder';
 import { downloadCustomResumeHandler } from '@/services/resume.services';
 import { toast } from 'sonner';
+import { useApiMutation } from '@/hooks/useApiMutation';
+import { useParams } from 'next/navigation';
+import { useUser } from '@/context/UserContext';
 
 interface TopNavBarProps {
   saveStatus: SaveStatus;
@@ -31,8 +34,9 @@ interface TopNavBarProps {
 }
 
 export function TopNavBar({ saveStatus, documentTitle }: TopNavBarProps) {
-  const [isExporting, setIsExporting] = useState(false);
+const {user} = useUser()
   const [isSuccess, setIsSuccess] = useState(false);
+  const { customBuilderId } = useParams<{ customBuilderId: string }>();
 
 
 const triggerFileDownload = async (url: string) => {
@@ -43,9 +47,19 @@ const triggerFileDownload = async (url: string) => {
   link.click();
   document.body.removeChild(link);
 };
+
+  const downloadMutation = useApiMutation({
+    endpoint:`/resume/${customBuilderId || Math.random()}/generate-custom-download`,
+    actionName:"download custom resume",
+    actionType:"SERVER_SIDE",
+    method:"POST"
+  })
   const handleDownload = async () => {
-    try {
-      setIsExporting(true);
+  if ((user?.wallet?.balance as number) < 10) {
+            toast.error("Insufficient balance. 10 credits required.");
+            return;
+          }
+      
       const canvas = document.getElementById('resume-canvas');
       if (canvas) {
         const inputs = canvas.querySelectorAll('input, textarea');
@@ -57,29 +71,18 @@ const triggerFileDownload = async (url: string) => {
       const body = {
         htmlContent: canvas?.outerHTML || ""
       };
+        
 
-      const response = await downloadCustomResumeHandler("8954245", body);
+      const response = await downloadMutation.mutateAsync(body);
 
       if (response?.success && response?.data) {
         // Cloudinary URL theke download
         console.log(response);
-        
         await triggerFileDownload(response.data);
-
         setIsSuccess(true);
-        toast.success("Resume exported successfully!");
         setTimeout(() => setIsSuccess(false), 3000);
-      } else {
-        throw new Error("Invalid response from server");
-      }
-    } catch (error) {
+      } 
     
-      console.error("Export failed:", error);
-      console.log(error);
-      toast.error("Could not generate PDF. Please try again also Check Wallet");
-    } finally {
-      setIsExporting(false);
-    }
   };
 
   return (
@@ -114,19 +117,19 @@ const triggerFileDownload = async (url: string) => {
           <AlertDialogTrigger asChild>
             <Button 
               size="sm" 
-              disabled={isExporting} 
+              disabled={downloadMutation.isPending} 
               className={`h-8 text-xs gap-2 px-4 shadow-sm transition-all duration-300 ${
                 isSuccess ? 'bg-emerald-600 hover:bg-emerald-700' : 'bg-primary hover:bg-primary/90'
               }`}
             >
-              {isExporting ? (
+              {downloadMutation.isPending ? (
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : isSuccess ? (
                 <Check className="h-3.5 w-3.5" />
               ) : (
                 <Download className="h-3.5 w-3.5" />
               )}
-              {isExporting ? "Processing..." : isSuccess ? "Done!" : "Download PDF"}
+              {downloadMutation.isPending ? "Processing..." : isSuccess ? "Done!" : "Download PDF"}
             </Button>
           </AlertDialogTrigger>
           

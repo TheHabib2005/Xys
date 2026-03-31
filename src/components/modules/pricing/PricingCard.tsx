@@ -20,9 +20,9 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-// ----------------------------------------------------------------------
+
 // Interfaces
-// ----------------------------------------------------------------------
+
 interface PricingCardProps {
   plan: CreditPackage;
   isPopular?: boolean;
@@ -55,9 +55,9 @@ const getFeaturesForCredits = (credits: number): string[] => {
   ];
 };
 
-// ----------------------------------------------------------------------
+
 // Helper: Choose icon based on plan name or index
-// ----------------------------------------------------------------------
+
 const getPlanIcon = (name: string, index: number) => {
   const lower = name.toLowerCase();
   if (lower.includes('starter') || lower.includes('basic')) {
@@ -88,7 +88,6 @@ export const PricingCard = ({ plan, isPopular = false, index }: PricingCardProps
     actionName: "Buy Credit",
     actionType: "SERVER_SIDE",
     method: "POST",
-
   })
 
   const handleBuyCredit = async (planId: string) => {

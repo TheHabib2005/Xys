@@ -45,6 +45,7 @@ import { downloadResumeHandler, updateResumeName } from "@/services/resume.servi
 import { getAllTemplateDetailsPublic } from "@/services/admin.services";
 import { useQuery } from "@tanstack/react-query";
 import { useUser } from "@/context/UserContext";
+import { useApiMutation } from "@/hooks/useApiMutation";
 
 export default function PremiumResumeBuilder({
   id,
@@ -62,7 +63,7 @@ export default function PremiumResumeBuilder({
   const [reviewMode, setReviewMode] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isDownloading, setIsDownloading] = useState(false);
+
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [sectionValidationMap, setSectionValidationMap] = useState<
     Record<string, { valid: boolean; count: number; fields: string[] }>
@@ -182,7 +183,15 @@ export default function PremiumResumeBuilder({
     }
   };
 
+
+  const downloadMutation = useApiMutation({
+    endpoint:`/resume/${builderId}/generate-download`,
+    actionName:"sdfdf",
+    actionType:"SERVER_SIDE",
+    method:"POST"
+  })
   const handleGenerateResume = async () => {
+    
     if (!template?.htmlLayout) return;
 
     if ((user?.wallet?.balance as number) < 10) {
@@ -190,20 +199,14 @@ export default function PremiumResumeBuilder({
       return;
     }
 
-    try {
-      setIsDownloading(true);
-      const result = await downloadResumeHandler(builderId);
+
+      const result = await downloadMutation.mutateAsync({})
 
       if (result.success) {
         setShowSuccessModal(true);
         handleClickDownload(result.data.resumeUrl);
-        toast.success("Your Resume is Downloaded");
       }
-    } catch (err) {
-      toast.error("Failed to generate resume");
-    } finally {
-      setIsDownloading(false);
-    }
+    
   };
 
   const handleClickDownload = (url: string) => {
@@ -324,10 +327,10 @@ export default function PremiumResumeBuilder({
                 type="button"
                 size="sm"
                 variant="outline"
-                disabled={isDownloading}
+                disabled={downloadMutation.isPending}
                 className="rounded-full bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800 shadow-sm h-9 hover:bg-zinc-50"
               >
-                {isDownloading ? (
+                {downloadMutation.isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Download className="h-4 w-4" />
