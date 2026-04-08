@@ -59,7 +59,7 @@ export function useApiMutation<TData = any, TVariables = any, TContext = unknown
     if(data.success){
         toast.success(finalSuccessMessage);
     }else{
-        toast.error(finalSuccessMessage);
+        toast.error("somethink wrong please try again");
     }
 
       // 2. Invalidate Queries

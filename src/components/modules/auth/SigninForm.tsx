@@ -79,10 +79,13 @@ export function SignInForm() {
             if (userData?.success) {
                 toast.success("You are Login Successfully")
                 await fetchUser()
-                if (userData.user.role !== UserRole.USER) {
+                if (userData.user.role === UserRole.ADMIN) {
                     router.push("/admin/dashboard")
-                } else {
+                } else if(userData.user.role === UserRole.MANAGER) {
+                    router.push("/moderator/dashboard")
+                }else{
                     router.push("/dashboard")
+
                 }
             } else {
                 if (userData?.errors && Array.isArray(userData.errors)) {

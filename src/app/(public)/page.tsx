@@ -9,7 +9,7 @@ import ProductHighlight from '@/components/modules/landing-pages/ProductHighligh
 import { ResumeFeaturesSection } from '@/components/modules/landing-pages/resume-features'
 import { StatsCounterSection } from '@/components/modules/landing-pages/StatsCounter'
 import { BlogPreviewSection } from '@/components/modules/landing-pages/BlogPreview'
-import ScrollToTop from '@/components/modules/landing-pages/ScrollToTop'
+import GoTopButton from '@/components/modules/landing-pages/ScrollToTop'
 import { TestimonialsSection } from '@/components/modules/landing-pages/testimonials'
 import { TeamSection } from '@/components/modules/landing-pages/team'
 import ChatBot from '@/components/global/ChatBot'
@@ -25,11 +25,11 @@ export default function Home() {
       <ProductHighlight />
       <StatsCounterSection />
       <TestimonialsSection />
-      <TeamSection />
+ 
       <BlogPreviewSection />
       <CareersSection />
       <FAQSection />
-      <ScrollToTop />
+      <GoTopButton />
    <ChatBot/>
     </main>
   )

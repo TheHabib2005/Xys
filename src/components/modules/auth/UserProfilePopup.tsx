@@ -30,7 +30,8 @@ interface UserProfileProps {
 const UserProfile = ({ user, showDetails = false }: UserProfileProps) => {
   // Determine base path based on role
   const isAdmin = user.user.role === "ADMIN";
-  const dashboardHref = isAdmin ? "/admin/dashboard" : "/dashboard";
+  const isManager = user.user.role === "MANAGER";
+  const dashboardHref = isAdmin ? "/admin/dashboard" : isManager ? "/moderator/dashboard" : "/dashboard";
 
   const menuItems = [
     {
@@ -40,7 +41,7 @@ const UserProfile = ({ user, showDetails = false }: UserProfileProps) => {
     },
     {
       label: "Settings",
-      href: "/dashboard/settings",
+      href: `/${dashboardHref}/settings`,
       icon: Settings,
     },
   ];

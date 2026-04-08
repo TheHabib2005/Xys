@@ -8,9 +8,9 @@ const SocialLogin = () => {
   const handleGoogleLogin = async () => {
     try {
       setIsLoading(true);
-      const res = await httpClient.post("/api/auth/sign-in/social", {
+      const res = await httpClient.post("/auth/sign-in/social", {
         provider: "google",
-        callbackURL: `${envVeriables.NEXT_PUBLIC_API_URL}/api/v1/auth/google/success?redirect=%2Fdashboard%2Fpatient`
+        callbackURL: `${envVeriables.NEXT_PUBLIC_API_URL}/auth/google/success?redirect=%2Fdashboard%2Fpatient`
       });
 
       const data = await res.data;

@@ -62,7 +62,7 @@ export default function UserContextWrapper({ children }: { children: React.React
       queryClient.invalidateQueries({ queryKey: [cacheKey] });
       setUser(null);
       // Redirect to login page
-      router.push("/login");
+      router.push("/sign-in");
     }
   }, [isError, error, router, queryClient]);
 

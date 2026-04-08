@@ -42,6 +42,8 @@ export default function PublicHeader() {
     { label: "Analyzer", path: "/analysis" },
     { label: "Pricing", path: "/pricing" },
     { label: "Reviews", path: "/reviews" },
+    { label: "Blogs", path: "/blog" },
+    { label: "Issues", path: "/issue" },
     { label: "About", path: "/about-us" },
     { label: "Contact", path: "/contact-us" },
   ];

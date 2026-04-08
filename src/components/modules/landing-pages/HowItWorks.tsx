@@ -1,8 +1,9 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { Upload, Sparkles, BarChart3, Download } from 'lucide-react'
+import { Upload, Sparkles, BarChart3, Download, ArrowRight } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { Button } from '@/components/ui/button' // Assuming you use shadcn/ui
 
 const steps = [
   {
@@ -54,8 +55,9 @@ const steps = [
 export function HowItWorksSection() {
   return (
     <section className="relative w-full bg-background py-24 overflow-hidden">
-      {/* Background Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[600px] h-[600px] bg-blue-500/10 blur-[150px] rounded-full pointer-events-none" />
+      {/* Background Decor */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 -z-10 w-[800px] h-[800px] bg-blue-500/5 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute top-0 right-0 -z-10 w-[300px] h-[300px] bg-purple-500/5 blur-[100px] rounded-full pointer-events-none" />
 
       <div className="container mx-auto px-4 lg:px-8">
         {/* Section Header */}
@@ -77,7 +79,7 @@ export function HowItWorksSection() {
             transition={{ delay: 0.1, duration: 0.6 }}
             className="text-4xl md:text-5xl font-extrabold tracking-tight text-slate-900 dark:text-white"
           >
-            How It <span className="text-blue-600">Works</span>
+            How It <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">Works</span>
           </motion.h2>
 
           <motion.p
@@ -93,21 +95,17 @@ export function HowItWorksSection() {
 
         {/* Steps Grid */}
         <div className="relative grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-6">
-          {/* Connecting Line (visible on lg screens) */}
-          <div className="hidden lg:block absolute top-[72px] left-[12%] right-[12%] h-[2px]">
+          
+          {/* Connecting Line (Desktop) */}
+          <div className="hidden lg:block absolute top-[72px] left-[12%] right-[12%] h-[2px] -z-0">
             <motion.div
               initial={{ scaleX: 0 }}
               whileInView={{ scaleX: 1 }}
               viewport={{ once: true }}
-              transition={{ duration: 1, delay: 0.5, ease: 'easeInOut' }}
-              className="w-full h-full bg-gradient-to-r from-blue-500/20 via-purple-500/20 via-emerald-500/20 to-orange-500/20 origin-left"
+              transition={{ duration: 1.5, delay: 0.5, ease: 'easeInOut' }}
+              className="w-full h-full bg-gradient-to-r from-blue-500/40 via-purple-500/40 via-emerald-500/40 to-orange-500/40 origin-left"
             />
-            {/* Dotted overlay */}
-            <div className="absolute inset-0 bg-[repeating-linear-gradient(90deg,transparent,transparent_8px,var(--tw-shadow-color,white)_8px,var(--tw-shadow-color,white)_16px)] dark:bg-[repeating-linear-gradient(90deg,transparent,transparent_8px,rgb(15,23,42)_8px,rgb(15,23,42)_16px)]" />
           </div>
-
-          {/* Connecting Line (visible on md screens, vertical between row pairs) */}
-          <div className="hidden md:block lg:hidden absolute top-1/2 left-1/2 -translate-x-1/2 w-[2px] h-8 bg-slate-200 dark:bg-white/10" />
 
           {steps.map((step, index) => (
             <motion.div
@@ -116,38 +114,43 @@ export function HowItWorksSection() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.15, duration: 0.6 }}
+              whileHover={{ y: -5 }}
               className="relative group"
             >
               <div
                 className={cn(
-                  'relative h-full p-8 rounded-3xl border border-slate-100 dark:border-white/5',
-                  'bg-slate-50/50 dark:bg-white/[0.02]',
-                  'hover:bg-white dark:hover:bg-white/[0.04]',
-                  'hover:shadow-xl hover:shadow-blue-500/5',
-                  'transition-all duration-300'
+                  'relative h-full p-8 rounded-3xl border border-slate-200/50 dark:border-white/5',
+                  'bg-white/50 dark:bg-white/[0.02] backdrop-blur-sm',
+                  'hover:border-blue-500/30 dark:hover:border-white/10 transition-all duration-500',
+                  'shadow-sm hover:shadow-2xl hover:shadow-blue-500/10'
                 )}
               >
-                {/* Background glow on hover */}
+                {/* Step Number Badge */}
+                <div className="absolute -top-3 -left-3 w-8 h-8 rounded-full bg-background border border-slate-200 dark:border-slate-800 flex items-center justify-center text-[10px] font-bold text-slate-500 z-20 shadow-sm group-hover:border-blue-500/50 transition-colors">
+                  {step.number}
+                </div>
+
+                {/* Card Glow */}
                 <div
                   className={cn(
-                    'absolute -top-4 -right-4 w-32 h-32 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-[60px]',
+                    'absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none blur-xl -z-10',
                     step.glow
                   )}
                 />
 
-                {/* Step Number */}
-                <div className="relative z-10 mb-6 flex items-center gap-4">
+                {/* Icon Container */}
+                <div className="relative z-10 mb-6 flex items-end justify-between">
                   <div
                     className={cn(
                       'w-14 h-14 rounded-2xl flex items-center justify-center',
-                      'shadow-sm border group-hover:scale-110 transition-transform duration-300',
+                      'shadow-inner border group-hover:scale-110 transition-transform duration-500',
                       step.bg,
                       step.border
                     )}
                   >
                     <step.icon className={cn('w-6 h-6', step.color)} />
                   </div>
-                  <span className="text-5xl font-black text-slate-100 dark:text-white/5 select-none group-hover:text-slate-200 dark:group-hover:text-white/10 transition-colors">
+                  <span className="text-6xl font-black text-slate-200/40 dark:text-white/5 select-none transition-colors group-hover:text-slate-200 dark:group-hover:text-white/10">
                     {step.number}
                   </span>
                 </div>
@@ -162,30 +165,30 @@ export function HowItWorksSection() {
                   </p>
                 </div>
 
-                {/* Arrow connector on lg (appears after each card except last) */}
+                {/* Arrow connector for Desktop */}
                 {index < steps.length - 1 && (
-                  <div className="hidden lg:flex absolute -right-3 top-[72px] z-20 w-6 h-6 rounded-full bg-white dark:bg-slate-950 border border-slate-200 dark:border-white/10 items-center justify-center shadow-sm">
-                    <svg
-                      width="10"
-                      height="10"
-                      viewBox="0 0 10 10"
-                      className="text-slate-400 dark:text-slate-500"
-                    >
-                      <path
-                        d="M1 5h7M6 2l3 3-3 3"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                  <div className="hidden lg:flex absolute -right-3 top-[72px] z-30 w-6 h-6 rounded-full bg-background border border-slate-200 dark:border-slate-800 items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                    <ArrowRight className="w-3 h-3 text-slate-400" />
                   </div>
                 )}
               </div>
             </motion.div>
           ))}
         </div>
+
+        {/* Bottom CTA */}
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.8 }}
+          className="mt-20 flex justify-center"
+        >
+          <Button size="lg" className="rounded-full px-8 h-12 bg-blue-600 hover:bg-blue-700 text-white shadow-lg shadow-blue-500/20 group">
+            Analyze Your Resume Now
+            <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Button>
+        </motion.div>
       </div>
     </section>
   )

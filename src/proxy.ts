@@ -28,7 +28,7 @@ export async function proxy(request: NextRequest) {
           const userRole = userData.user.role as UserRole;
           console.log(userRole);
           
-          const redirectPath = userRole === UserRole.ADMIN ? '/admin' : userRole === UserRole.MANAGER ? '/moderator' : '/dashboard';
+          const redirectPath = userRole === UserRole.ADMIN ? '/admin/dashboard' : userRole === UserRole.MANAGER ? '/moderator/dashboard' : '/dashboard';
           return NextResponse.redirect(new URL(redirectPath, request.url));
         }
       } catch (e) {
@@ -84,19 +84,25 @@ export async function proxy(request: NextRequest) {
   }
 
   const userRole = userData?.user?.role as UserRole | undefined;
+console.log("role",userRole,userData);
 
   // 7. Role‑based Access Control (RBAC)
+   if (pathname.startsWith('/moderator') && userRole !== UserRole.MANAGER) {
+    console.log("re-form-here");
+    
+    return NextResponse.redirect(new URL('/unauthorized', request.url));
+  }
   if (pathname.startsWith('/admin') && userRole !== UserRole.ADMIN) {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
   if (pathname.startsWith('/dashboard') && userRole !== UserRole.USER) {
+    console.log("re-form-here user");
+
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
-  console.log(userRole);
+
   
-  if (pathname.startsWith('/moderator') && userRole !== UserRole.MANAGER) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
-  }
+ 
 
   // 8. Finalize response and set refreshed cookies if necessary
   const response = NextResponse.next();

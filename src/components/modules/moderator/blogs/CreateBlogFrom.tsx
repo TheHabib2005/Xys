@@ -41,6 +41,10 @@ import UnderlineExtension from "@tiptap/extension-underline";
 import TextAlign from "@tiptap/extension-text-align";
 import Link from "@tiptap/extension-link";
 import Image from "@tiptap/extension-image";
+import { handleAvatarUpload } from "@/services/auth.services";
+import { toast } from "sonner";
+import { createBlog } from "@/services/blog.services";
+import { useApiMutation } from "@/hooks/useApiMutation";
 
 // --- Types (optional, for clarity) ---
 interface FormData {
@@ -72,7 +76,7 @@ export default function CreateBlogPage() {
   const [isUploading, setIsUploading] = useState(false);
  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [globalLoading, setGlobalLoading] = useState(false);
-  const [actionType, setActionType] = useState<"draft" | "publish" | null>(null);
+  const [actionType, setActionType] = useState<"DRAFT" | "PUBLISHED" | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   // --- TipTap Editor Setup ---
@@ -140,19 +144,30 @@ export default function CreateBlogPage() {
   const handleThumbnailChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+       setIsUploading(true)
 
+ 
     // Show preview immediately
-    const previewUrl = URL.createObjectURL(file);
-    setThumbnailPreview(previewUrl);
-
     // Simulate upload delay
-    setIsUploading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500)); // dummy delay
 
-    // In a real app, you'd upload to cloud and get URL
-    // For now, store the preview URL as "uploaded" thumbnail
-    setFormData((prev) => ({ ...prev, thumbnail: previewUrl }));
-    setIsUploading(false);
+      const selectedFile = e.target.files?.[0];
+      if (!selectedFile) return;
+     const formData = new FormData();
+    formData.append("avatar", selectedFile); 
+      try {
+        // Fetching the preview/temp URL from your API
+        const response =  await handleAvatarUpload(formData)
+        console.log(response);
+        
+    setFormData((prev) => ({ ...prev, thumbnail: response.data.data.secure_url }));
+
+        setThumbnailPreview(response.data.data.secure_url); 
+       setIsUploading(false)
+      } catch (error) {
+        toast.error("Failed to process image");
+      setThumbnailPreview(null)
+      }
+ 
   };
 
   const clearThumbnail = () => {
@@ -318,15 +333,34 @@ console.log(formData);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleAction = async (type: "draft" | "publish") => {
+  const publishmutation = useApiMutation({
+    actionName:"sfsdf",
+    actionType:"SERVER_SIDE",
+   method:"POST",
+   endpoint:"/blog"
+  })
+
+  const handleAction = async (type: "DRAFT" | "PUBLISHED") => {
     setIsMenuOpen(false); // Close menu first
     setActionType(type);
     setGlobalLoading(true);
 
+console.log();
+
     try {
       // Your Tanstack Mutation or API call logic here
-      await new Promise((resolve) => setTimeout(resolve, 3000));
-      console.log(`${type} successful!`);
+     const result = await publishmutation.mutateAsync({...formData,status:type.toUpperCase()})
+     console.log(result);
+     setFormData({
+       title: "",
+    slug: "",
+    category: "",
+    excerpt: "",
+    fullContent: "",
+    seoTags: [],
+    thumbnail: null,
+     })
+     
     } catch (error) {
       console.error(error);
     } finally {
@@ -397,7 +431,7 @@ console.log(formData);
 
                     {/* Publish Option */}
                     <button
-                      onClick={() => handleAction("publish")}
+                      onClick={() => handleAction("PUBLISHED")}
                       className="w-full flex items-center gap-3 px-3 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors group"
                     >
                       <Send className="w-4 h-4 group-hover:text-primary transition-colors" />
