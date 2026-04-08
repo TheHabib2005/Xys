@@ -10,7 +10,7 @@ const publiclayout = ({children}:{children:ReactNode}) => {
       
         {children}
       <Footer/>
-      <AIChatbot />
+      {/* <AIChatbot /> */}
 
     </div>
   )

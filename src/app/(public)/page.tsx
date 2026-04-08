@@ -12,6 +12,7 @@ import { BlogPreviewSection } from '@/components/modules/landing-pages/BlogPrevi
 import ScrollToTop from '@/components/modules/landing-pages/ScrollToTop'
 import { TestimonialsSection } from '@/components/modules/landing-pages/testimonials'
 import { TeamSection } from '@/components/modules/landing-pages/team'
+import ChatBot from '@/components/global/ChatBot'
 
 
 export default function Home() {
@@ -29,6 +30,7 @@ export default function Home() {
       <CareersSection />
       <FAQSection />
       <ScrollToTop />
+   <ChatBot/>
     </main>
   )
 }
