@@ -39,9 +39,18 @@ export function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="w-full bg-background text-foreground border-t border-border transition-colors duration-300 overflow-hidden">
+    <footer className="w-full bg-transparent text-foreground border-t border-border transition-colors duration-300 overflow-hidden">
       <div className="container max-w-[1440px] mx-auto px-6 md:px-12">
-        
+        <div className="absolute top-0 left-0 w-full h-full pointer-events-none opacity-20 dark:opacity-40">
+        <svg className="absolute top-0 left-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+              <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.5" className="text-slate-200 dark:text-slate-800" />
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#grid)" />
+        </svg>
+      </div>
         {/* TOP: Newsletter & Branding */}
         <div className="py-16 grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
           

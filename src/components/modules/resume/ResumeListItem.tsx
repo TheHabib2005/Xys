@@ -101,7 +101,7 @@ const ResumeListItem = ({ resume, cacheKey }: { resume: ResumeItem, cacheKey: st
                 {resume.name || "Untitled Resume"}
               </p>
               <p className="text-xs text-muted-foreground truncate">
-                Template {resume.templateId.slice(0, 8)}
+                Template {resume.templateId}
               </p>
             </div>
           </div>

@@ -97,6 +97,7 @@ const { data, isLoading, isError, error, refetch } = useQuery<ApiResponse>({
   queryKey:[cacheKey],
   queryFn:getAllResumeById
 });
+
   console.log(data);
   
 
