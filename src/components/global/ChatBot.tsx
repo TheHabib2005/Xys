@@ -340,7 +340,7 @@ export default function ChatModal() {
       {/* Floating Trigger Button */}
       <button
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white shadow-xl shadow-blue-500/30 transition-all hover:scale-105 hover:shadow-blue-500/50 active:scale-95 ${
+        className={`fixed bottom-16 right-6 z-40 flex h-14 w-14 items-center justify-center rounded-full bg-gradient-to-tr from-blue-600 to-purple-600 text-white shadow-xl shadow-blue-500/30 transition-all hover:scale-105 hover:shadow-blue-500/50 active:scale-95 ${
           isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'
         }`}
         aria-label="Open AI Assistant"

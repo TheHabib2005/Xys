@@ -6,7 +6,7 @@ import { getTokens, isTokenExpiringSoon, refreshTokens } from './services/auth.s
 import { UserRole } from './interfaces/enums';
 
 const AUTH_ROUTES = ['/sign-in', '/sign-up'];
-const PUBLIC_ROUTES = ['/', '/about-us', '/verify-email'];
+const PUBLIC_ROUTES = ['/', '/about-us',"/contact-us", '/verify-email','/issues'];
 
 
 export async function proxy(request: NextRequest) {
@@ -26,7 +26,9 @@ export async function proxy(request: NextRequest) {
         const userData = await decodeToken(accessToken);
         if (userData?.user) {
           const userRole = userData.user.role as UserRole;
-          const redirectPath = userRole === UserRole.ADMIN ? '/admin' : '/dashboard';
+          console.log(userRole);
+          
+          const redirectPath = userRole === UserRole.ADMIN ? '/admin' : userRole === UserRole.MANAGER ? '/moderator' : '/dashboard';
           return NextResponse.redirect(new URL(redirectPath, request.url));
         }
       } catch (e) {
@@ -88,6 +90,11 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
   if (pathname.startsWith('/dashboard') && userRole !== UserRole.USER) {
+    return NextResponse.redirect(new URL('/unauthorized', request.url));
+  }
+  console.log(userRole);
+  
+  if (pathname.startsWith('/moderator') && userRole !== UserRole.MANAGER) {
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 

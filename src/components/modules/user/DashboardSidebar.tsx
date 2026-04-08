@@ -60,6 +60,13 @@ const NAVIGATION_CONFIG = {
 
 
   ],
+  MANAGER: [
+  
+    { path: "/moderator/dashboard/manage-blogs", label: "Manages Blogs", icon: LucideBookTemplate },
+   
+
+
+  ],
   SETTINGS: [
     { path: "/pricing", label: "Billing", icon: CreditCard },
 
@@ -72,10 +79,11 @@ export default function DashboardSidebar() {
   
   const isCollapsed = state === "collapsed";
   const isAdmin = user?.user.role === UserRole.ADMIN
+  const isManager = user?.user.role === UserRole.MANAGER
 console.log(isAdmin);
 
   // Determine which main nav items to show
-  const mainNavItems = isAdmin ? NAVIGATION_CONFIG.ADMIN : NAVIGATION_CONFIG.USER;
+  const mainNavItems = isAdmin ? NAVIGATION_CONFIG.ADMIN : isManager ? NAVIGATION_CONFIG.MANAGER : NAVIGATION_CONFIG.USER;
 
   return (
     <Sidebar collapsible="offcanvas" className="border-r border-border/50 bg-card/50 backdrop-blur-xl">

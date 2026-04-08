@@ -247,7 +247,7 @@ export default function BlogPage() {
       {/* Hero Section                                                      */}
       {/* ----------------------------------------------------------------- */}
       <section className="py-16 overflow-hidden">
-        <div className="container max-w-6xl mx-auto px-6 text-center">
+        <div className="container max-w-7xl mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}

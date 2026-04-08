@@ -1,4 +1,5 @@
 import { AnalysisResult } from "./analysis";
+import { UserRole } from "./enums";
 
 
 export interface IUser {
@@ -25,7 +26,7 @@ export interface IBaseUser {
   name: string;
   email: string;
   image: string;
-  role:  'ADMIN' | 'USER';
+  role: UserRole;
   status: 'ACTIVE' | 'BANNED' | 'DELETED';
   needPasswordChange: boolean;
   emailVerified: boolean;
