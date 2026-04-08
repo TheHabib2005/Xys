@@ -87,7 +87,7 @@ const blogPosts = [
     id: 5,
     title: 'Top 5 Resume Mistakes Engineers Make (And How to Fix Them)',
     excerpt:
-      'Technical skills alone won't land the interview. Avoid these common resume pitfalls that even experienced engineers fall victim to.',
+      'Technical skills alone wont land the interview. Avoid these common resume pitfalls that even experienced engineers fall victim to.',
     image:
       'https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?w=800&h=500&fit=crop',
     category: 'Resume Tips',
