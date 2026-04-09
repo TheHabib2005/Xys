@@ -15,6 +15,17 @@ export const getAllBlogs = async (url) => {
     return result.data
 
 }
+export const getBlogDetails = async (id) => {
+    const cookieStore = await cookies()
+    const result = await httpClient.get(`/blog/${id}`, {
+        headers: {
+            "cookie": cookieStore.toString()
+        }
+    });
+
+    return result.data
+
+}
 export const createBlog = async (payload) => {
     const cookieStore = await cookies()
     const result = await httpClient.post("/blog", payload, {

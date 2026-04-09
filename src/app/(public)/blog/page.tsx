@@ -419,10 +419,7 @@ export default function BlogSearchExperiencePage() {
               <h1 className="mt-2 text-3xl font-semibold md:text-5xl">
                 Search blocks with AI-style suggestions
               </h1>
-              <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-300 md:text-base">
-                Search button চাপলে modal খুলবে, typing শুরু করলে নিচে AI-based suggestion list দেখা যাবে,
-                প্রতিটি suggestion-এ match percentage থাকবে, আর status অনুযায়ী filter করা যাবে।
-              </p>
+              
             </div>
 
             <div className="rounded-2xl border border-white/10 bg-slate-900/80 p-4">
